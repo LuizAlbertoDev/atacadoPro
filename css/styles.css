@@ -1,0 +1,499 @@
+/* ==============================================
+   AtacadoPro | Layout & Componentes
+   ============================================== */
+
+/* Reset */
+*, *::before, *::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+/* Body */
+body {
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 20px;
+    gap: 16px;
+}
+
+/* ---- HEADER ---- */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+}
+
+.header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--accent);
+}
+
+.header h1 span {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.status-badge {
+    background: #064e3b;
+    color: #34d399;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* Botão de busca */
+.btn-search {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition-fast);
+}
+
+.btn-search:hover {
+    border-color: var(--accent);
+    color: var(--text-main);
+}
+
+/* ---- CONTAINER DO MAPA ---- */
+.map-container {
+    flex-grow: 1;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 0; /* importante para o flex-grow funcionar corretamente */
+}
+
+svg#loja-svg {
+    width: 100%;
+    height: 100%;
+    max-width: 1400px;
+}
+
+/* ---- ELEMENTOS DO SVG ---- */
+.floor {
+    fill: var(--bg-body);
+    stroke: var(--border-color);
+    stroke-width: 2;
+}
+
+/* Setores */
+.section {
+    cursor: pointer;
+    transition: var(--transition-base);
+}
+
+.section rect {
+    fill: var(--bg-surface);
+    stroke: var(--border-color);
+    stroke-width: 2;
+}
+
+.section:hover rect {
+    stroke: var(--accent);
+    fill: #2d3748;
+}
+
+.section.active rect {
+    stroke: var(--accent);
+    fill: #1e3a8a;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+.section-text {
+    fill: var(--text-main);
+    font-size: 14px;
+    font-weight: bold;
+    text-anchor: middle;
+    dominant-baseline: middle;
+    pointer-events: none;
+    user-select: none;
+}
+
+.sub-text {
+    fill: var(--text-muted);
+    font-size: 10px;
+    font-weight: normal;
+    text-anchor: middle;
+    pointer-events: none;
+    user-select: none;
+}
+
+/* Prateleiras */
+.shelf {
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.shelf rect {
+    fill: var(--bg-surface);
+    stroke: var(--border-color);
+    stroke-width: 1.5;
+}
+
+.shelf:hover rect {
+    fill: #374151;
+    stroke: #9ca3af;
+}
+
+.shelf.active rect {
+    fill: var(--accent);
+    stroke: #fff;
+    filter: drop-shadow(0 0 5px var(--accent));
+}
+
+/* ---- STATUS DE VALIDADE NAS GÔNDOLAS (modo funcionário) ---- */
+.shelf.status-vencido rect {
+    fill: rgba(239, 68, 68, 0.22) !important;
+    stroke: #ef4444 !important;
+    filter: drop-shadow(0 0 5px rgba(239,68,68,0.65)) !important;
+}
+
+.shelf.status-atencao rect {
+    fill: rgba(245, 158, 11, 0.18) !important;
+    stroke: #f59e0b !important;
+    filter: drop-shadow(0 0 4px rgba(245,158,11,0.5)) !important;
+}
+
+/* Hover preserva o brilho de status */
+.shelf.status-vencido:hover rect {
+    fill: rgba(239, 68, 68, 0.38) !important;
+}
+
+.shelf.status-atencao:hover rect {
+    fill: rgba(245, 158, 11, 0.32) !important;
+}
+
+/* Quando está ativa E tem status, mantém a cor de status com borda branca */
+.shelf.active.status-vencido rect {
+    fill: rgba(239, 68, 68, 0.55) !important;
+    stroke: #fff !important;
+}
+
+.shelf.active.status-atencao rect {
+    fill: rgba(245, 158, 11, 0.45) !important;
+    stroke: #fff !important;
+}
+
+.shelf-id {
+    fill: var(--text-muted);
+    font-size: 10px;
+    font-weight: bold;
+    text-anchor: middle;
+    pointer-events: none;
+    user-select: none;
+}
+
+.shelf.active .shelf-id {
+    fill: #fff;
+}
+
+/* Linha guia dos corredores */
+.corridor-line {
+    stroke: #374151;
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+}
+
+/* ---- ROTA ANIMADA ---- */
+.route-path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 10 8;
+    animation: dash 1s linear infinite;
+    filter: drop-shadow(0 0 4px var(--accent));
+    transition: d 0.3s ease;
+}
+
+@keyframes dash {
+    to { stroke-dashoffset: -18; }
+}
+
+/* Nós de início e fim */
+.node-start { fill: var(--text-main); }
+.node-end {
+    fill: #ef4444;
+    filter: drop-shadow(0 0 6px rgba(239, 68, 68, 0.8));
+}
+
+/* ---- PAINEL DE INFORMAÇÃO ---- */
+.info-panel {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(17, 24, 39, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    padding: 18px 22px;
+    border-radius: var(--radius-md);
+    box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    width: 290px;
+    max-height: calc(100% - 40px);
+    overflow-y: auto;
+    animation: slideIn 0.2s ease;
+}
+
+.info-panel.visible {
+    display: flex;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.info-panel .info-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.info-panel h3 {
+    color: var(--accent);
+    font-size: 18px;
+    margin: 0;
+}
+
+.info-panel p {
+    color: var(--text-muted);
+    font-size: 13px;
+    margin: 0;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.close-btn:hover {
+    color: #fff;
+    background: var(--bg-surface);
+}
+
+/* ---- PAINEL: PRODUTOS DA GÔNDOLA ---- */
+.info-panel-titulo { color: var(--accent); font-size: 17px; margin: 0; }
+.info-panel-desc   { color: var(--text-muted); font-size: 12px; margin: 0; }
+
+.painel-divisor {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 4px 0;
+}
+
+.painel-produtos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 340px;
+    overflow-y: auto;
+    padding-right: 2px;
+}
+
+.painel-produtos-lista::-webkit-scrollbar { width: 4px; }
+.painel-produtos-lista::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+.painel-sem-produto {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 8px 0;
+}
+
+.painel-produto {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: var(--transition-fast);
+}
+
+.painel-produto:hover { border-color: #4b5563; }
+
+.painel-prod-topo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.painel-prod-id {
+    font-size: 9px;
+    font-weight: bold;
+    color: var(--accent);
+    background: rgba(59,130,246,0.12);
+    padding: 1px 6px;
+    border-radius: 10px;
+    letter-spacing: 0.4px;
+}
+
+.painel-prod-empresa {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.painel-prod-nome {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+    line-height: 1.3;
+}
+
+.painel-prod-preco {
+    font-size: 16px;
+    font-weight: 700;
+    color: #34d399;
+}
+
+.painel-prod-detalhe {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.painel-prod-deposito {
+    font-size: 10px;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.03);
+    padding: 3px 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+.btn-ver-todos {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 12px;
+    cursor: pointer;
+    text-align: right;
+    padding: 4px 0 0;
+    transition: var(--transition-fast);
+}
+
+.btn-ver-todos:hover { opacity: 0.8; text-decoration: underline; }
+
+/* ---- LEGENDA DO MAPA (modo funcionário) ---- */
+.mapa-legenda {
+    position: absolute;
+    top: 16px;
+    left: 16px;
+    background: rgba(17, 24, 39, 0.92);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+
+.legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legenda-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.legenda-dot.vencido { background: #ef4444; box-shadow: 0 0 5px rgba(239,68,68,0.8); }
+.legenda-dot.atencao { background: #f59e0b; box-shadow: 0 0 5px rgba(245,158,11,0.6); }
+.legenda-dot.ok      { background: #374151; border: 1px solid #4b5563; }
+
+/* ---- TOOLTIP DE GÔNDOLA ---- */
+.gondola-tooltip {
+    position: absolute;
+    background: var(--bg-surface);
+    border: 1px solid var(--accent);
+    color: var(--text-main);
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+    display: none;
+    white-space: nowrap;
+    z-index: 100;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+/* ---- RESPONSIVIDADE ---- */
+@media (max-width: 768px) {
+    body { padding: 10px; gap: 10px; }
+    .header { padding: 10px 15px; }
+    .header h1 { font-size: 16px; }
+    .info-panel {
+        bottom: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+    }
+}
+
+/* ---- ACESSIBILIDADE ---- */
+@media (prefers-reduced-motion: reduce) {
+    .route-path { animation: none; }
+    * { transition: none !important; }
+}

@@ -1,0 +1,299 @@
+/* ==============================================
+   AtacadoPro | dashboard.css
+   ============================================== */
+
+/* ---- TELA DASHBOARD ---- */
+#tela-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    overflow-y: auto;
+    padding-right: 4px;
+    flex-grow: 1;
+    min-height: 0;
+}
+
+#tela-dashboard::-webkit-scrollbar { width: 6px; }
+#tela-dashboard::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+
+/* ---- CARDS DE RESUMO ---- */
+.dash-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+}
+
+.dash-card {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: var(--transition-base);
+}
+
+.dash-card:hover { border-color: #4b5563; }
+
+.dash-card.card-alerta {
+    border-color: #7f1d1d;
+    background: #1a0a0a;
+}
+
+.dash-card.card-atencao-bg {
+    border-color: #78350f;
+    background: #1a1000;
+}
+
+.dash-card-icon { font-size: 28px; }
+
+.dash-card-valor {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-main);
+    line-height: 1;
+}
+
+.dash-card-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* ---- SEÇÕES DO DASHBOARD ---- */
+.dash-secoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) { .dash-secoes { grid-template-columns: 1fr; } }
+
+.dash-secao {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 340px;
+    overflow-y: auto;
+}
+
+.dash-secao::-webkit-scrollbar { width: 4px; }
+.dash-secao::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+.dash-secao-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border-color);
+    flex-shrink: 0;
+}
+
+.dash-vazia {
+    color: var(--text-muted);
+    font-size: 13px;
+    text-align: center;
+    padding: 20px 0;
+}
+
+/* ---- CARD DE LOTE ---- */
+.dash-lote-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dash-lote-card.vencido { border-color: #7f1d1d; background: #160808; }
+.dash-lote-card.atencao { border-color: #78350f; background: #160d00; }
+
+.dash-lote-topo {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.dash-lote-empresa {
+    font-size: 11px;
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.dash-lote-nome {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.dash-lote-info {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+.dash-lote-local {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: rgba(255,255,255,0.03);
+    padding: 3px 6px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+/* ---- TABELA GERAL ---- */
+.dash-tabela-wrap {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow-x: auto;
+}
+
+.dash-tabela {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.dash-tabela th {
+    text-align: left;
+    padding: 8px 10px;
+    color: var(--text-muted);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.dash-tabela td {
+    padding: 8px 10px;
+    border-bottom: 1px solid #1f2937;
+    color: var(--text-main);
+    vertical-align: middle;
+}
+
+.dash-tabela tr:last-child td { border-bottom: none; }
+.dash-tabela tr:hover td { background: rgba(255,255,255,0.02); }
+
+.dash-tr-vencido td { background: rgba(127,29,29,0.15); }
+.dash-tr-atencao td { background: rgba(120,53,15,0.15); }
+
+/* ---- VALIDADES NO FORMULÁRIO ---- */
+.val-vazia {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-align: center;
+    padding: 10px;
+    border: 1px dashed var(--border-color);
+    border-radius: var(--radius-md);
+}
+
+.val-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+    background: var(--bg-surface);
+    gap: 8px;
+}
+
+.val-item.vencido { border-color: #7f1d1d; background: #160808; }
+.val-item.atencao { border-color: #78350f; }
+
+.val-info { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+.val-data { font-size: 13px; font-weight: 600; color: var(--text-main); }
+.val-qtd  { font-size: 12px; color: var(--text-muted); }
+.val-badge { font-size: 10px !important; }
+
+.val-add-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.btn-excluir-val {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 4px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+    flex-shrink: 0;
+}
+
+.btn-excluir-val:hover { background: rgba(239,68,68,0.2); }
+
+/* ---- VALIDADES NO CARD DA LISTA ---- */
+.validades-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    padding-top: 8px;
+    border-top: 1px solid var(--border-color);
+}
+
+.val-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+}
+
+.val-qtd-row {
+    color: var(--text-muted);
+    flex: 1;
+}
+
+.btn-excluir-val-inline {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 1px 4px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition-fast);
+}
+
+.btn-excluir-val-inline:hover { background: rgba(239,68,68,0.2); }
+
+.btn-add-val-inline {
+    width: 100%;
+    padding: 6px;
+    background: rgba(59,130,246,0.08);
+    border: 1px dashed rgba(59,130,246,0.3);
+    border-radius: var(--radius-md);
+    color: var(--accent);
+    font-size: 11px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-top: 2px;
+}
+
+.btn-add-val-inline:hover { background: rgba(59,130,246,0.15); }
+
+/* Card com atenção */
+.produto-card.card-atencao { border-color: #78350f; }
