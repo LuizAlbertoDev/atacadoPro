@@ -1,67 +1,96 @@
 /**
  * AtacadoPro | auth.js
- * Gerencia o modo funcionário (toggle simples com senha).
+ * Sistema de login com perfis: cliente, admin, conferente, caixa.
  */
 
 const Auth = (() => {
-    const SENHA = '1234'; // Trocar conforme necessário
-    let _funcionario = false;
+    // perfil atual: 'cliente' | 'admin' | 'conferente' | 'caixa'
+    let _perfil = 'cliente';
 
-    function isFuncionario() {
-        return _funcionario;
-    }
+    const PERFIS = {
+        cliente:    { label: 'Cliente',    icon: '👤' },
+        admin:      { label: 'Admin',      icon: '🛡️' },
+        conferente: { label: 'Conferente', icon: '📋' },
+        caixa:      { label: 'Caixa',      icon: '🏧' },
+    };
 
-    function ativarModo() {
-        const senha = prompt('Digite a senha do funcionário:');
-        if (senha === null) return false; // cancelou
-        if (senha === SENHA) {
-            _funcionario = true;
-            _atualizarUI();
-            return true;
-        } else {
-            alert('Senha incorreta.');
-            return false;
-        }
-    }
+    function perfil()         { return _perfil; }
+    function isCliente()      { return _perfil === 'cliente'; }
+    function isFuncionario()  { return _perfil !== 'cliente'; }
+    function isAdmin()        { return _perfil === 'admin'; }
+    function isCaixa()        { return _perfil === 'caixa'; }
 
-    function desativarModo() {
-        _funcionario = false;
+    function login(novoPerfil) {
+        _perfil = novoPerfil;
+        _fecharModal();
         _atualizarUI();
+        document.dispatchEvent(new CustomEvent('perfilAlterado', { detail: { perfil: _perfil } }));
     }
 
-    function toggle() {
-        if (_funcionario) {
-            desativarModo();
-        } else {
-            ativarModo();
-        }
+    function logout() {
+        login('cliente');
+    }
+
+    function abrirModal() {
+        document.getElementById('modal-login').classList.add('aberto');
+    }
+
+    function _fecharModal() {
+        document.getElementById('modal-login').classList.remove('aberto');
     }
 
     function _atualizarUI() {
-        const btn = document.getElementById('btn-modo-funcionario');
-        const badges = document.querySelectorAll('.badge-funcionario');
-        const elsFuncionario = document.querySelectorAll('.so-funcionario');
-        const elsCliente = document.querySelectorAll('.so-cliente');
+        const btnLogin  = document.getElementById('btn-login');
+        const perfilTag = document.getElementById('perfil-tag');
 
-        if (!btn) return;
-
-        if (_funcionario) {
-            btn.textContent = '🔓 Modo Funcionário';
-            btn.classList.add('ativo');
-            badges.forEach(b => b.style.display = 'inline-flex');
-            elsFuncionario.forEach(e => e.style.display = '');
-            elsCliente.forEach(e => e.style.display = 'none');
+        // Atualiza botão/tag no header
+        if (_perfil === 'cliente') {
+            btnLogin.textContent  = '🔑 Login';
+            btnLogin.className    = 'btn-login-header';
+            if (perfilTag) perfilTag.style.display = 'none';
         } else {
-            btn.textContent = '🔑 Modo Funcionário';
-            btn.classList.remove('ativo');
-            badges.forEach(b => b.style.display = 'none');
-            elsFuncionario.forEach(e => e.style.display = 'none');
-            elsCliente.forEach(e => e.style.display = '');
+            const p = PERFIS[_perfil];
+            btnLogin.textContent = 'Sair';
+            btnLogin.className   = 'btn-login-header ativo';
+            if (perfilTag) {
+                perfilTag.textContent = `${p.icon} ${p.label}`;
+                perfilTag.style.display = 'inline-flex';
+            }
         }
 
-        // Dispara evento para outros módulos atualizarem
-        document.dispatchEvent(new CustomEvent('modoAlterado', { detail: { funcionario: _funcionario } }));
+        // Visibilidade de elementos por perfil
+        document.querySelectorAll('.so-funcionario').forEach(el => {
+            el.style.display = isFuncionario() ? '' : 'none';
+        });
+        document.querySelectorAll('.so-admin').forEach(el => {
+            el.style.display = isAdmin() ? '' : 'none';
+        });
+        document.querySelectorAll('.so-caixa').forEach(el => {
+            el.style.display = isCaixa() ? '' : 'none';
+        });
+        document.querySelectorAll('.so-cliente').forEach(el => {
+            el.style.display = isCliente() ? '' : 'none';
+        });
+
+        // Aba dashboard só para admin
+        const tabDash = document.querySelector('.tab-dashboard');
+        if (tabDash) tabDash.style.display = isAdmin() ? '' : 'none';
+
+        // Aba caixa só para caixa e admin
+        const tabCaixa = document.querySelector('.tab-caixa');
+        if (tabCaixa) tabCaixa.style.display = (isCaixa() || isAdmin()) ? '' : 'none';
+
+        // Indicadores no mapa
+        if (typeof MapBuilder !== 'undefined') {
+            MapBuilder.atualizarIndicadoresValidade(isFuncionario());
+        }
     }
 
-    return { isFuncionario, toggle, ativarModo, desativarModo };
+    // Toggle do botão header
+    function toggleLogin() {
+        if (_perfil === 'cliente') abrirModal();
+        else logout();
+    }
+
+    return { perfil, isCliente, isFuncionario, isAdmin, isCaixa, login, logout, toggleLogin, abrirModal };
 })();

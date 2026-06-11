@@ -8,295 +8,399 @@
     <link rel="stylesheet" href="css/styles.css" />
     <link rel="stylesheet" href="css/cadastro.css" />
     <link rel="stylesheet" href="css/dashboard.css" />
+    <link rel="stylesheet" href="css/caixa.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
 
-    <header class="header">
-        <h1>AtacadoPro <span>| Localizador de Produtos</span></h1>
-        <div class="header-right">
-            <button id="btn-modo-funcionario" onclick="Auth.toggle()">🔑 Modo Funcionário</button>
-            <div class="status-badge">SISTEMA ONLINE</div>
+<!-- ========== TELA DE LOGIN INICIAL ========== -->
+<div id="login-overlay" class="login-overlay">
+    <div class="login-logo">
+        <h1>AtacadoPro</h1>
+        <p>Sistema de Gestão · Como deseja entrar?</p>
+    </div>
+    <div class="login-cards">
+        <div class="login-card cliente" onclick="Auth.login('cliente')">
+            <div class="login-card-icon">👤</div>
+            <div class="login-card-label">Cliente</div>
+            <div class="login-card-desc">Ver mapa e produtos</div>
         </div>
-    </header>
+        <div class="login-card caixa" onclick="Auth.login('caixa')">
+            <div class="login-card-icon">🏧</div>
+            <div class="login-card-label">Caixa</div>
+            <div class="login-card-desc">Registrar vendas</div>
+        </div>
+        <div class="login-card conferente" onclick="Auth.login('conferente')">
+            <div class="login-card-icon">📋</div>
+            <div class="login-card-label">Conferente</div>
+            <div class="login-card-desc">Conferência de estoque</div>
+        </div>
+        <div class="login-card admin" onclick="Auth.login('admin')">
+            <div class="login-card-icon">🛡️</div>
+            <div class="login-card-label">Admin</div>
+            <div class="login-card-desc">Acesso completo</div>
+        </div>
+    </div>
+</div>
 
-    <nav class="app-tabs">
-        <button class="tab-btn ativo"         onclick="App.mudarAba('mapa')">🗺️ Mapa da Loja</button>
-        <button class="tab-btn"               onclick="App.mudarAba('produtos')">📦 Produtos</button>
-        <button class="tab-btn so-funcionario" style="display:none" onclick="App.mudarAba('dashboard')">📊 Dashboard</button>
-    </nav>
+<!-- ========== APP PRINCIPAL ========== -->
+<header class="header">
+    <h1>AtacadoPro <span>| Localizador de Produtos</span></h1>
+    <div class="header-right">
+        <span id="perfil-tag"></span>
+        <button id="btn-login" class="btn-login-header" onclick="Auth.toggleLogin()">🔑 Login</button>
+        <div class="status-badge">SISTEMA ONLINE</div>
+    </div>
+</header>
 
-    <!-- ===== MAPA ===== -->
-    <div id="tela-mapa" class="map-container">
-        <svg id="loja-svg" viewBox="0 0 1200 850" role="img" aria-label="Mapa interativo">
-            <rect class="floor" x="10" y="10" width="1180" height="830" rx="8" />
+<nav class="app-tabs">
+    <button class="tab-btn ativo"                    onclick="App.mudarAba('mapa')">🗺️ Mapa</button>
+    <button class="tab-btn"                          onclick="App.mudarAba('produtos')">📦 Produtos</button>
+    <button class="tab-btn tab-caixa"  style="display:none" onclick="App.mudarAba('caixa')">🏧 Caixa</button>
+    <button class="tab-btn tab-dashboard so-admin" style="display:none" onclick="App.mudarAba('dashboard')">📊 Dashboard</button>
+</nav>
 
-            <g class="section" id="setor-acougue"    onclick="MapRouter.tracarRota('Açougue','Carnes Frescas',80,80)">
-                <rect x="20" y="20" width="120" height="120" rx="6" style="stroke:var(--cor-acougue)"/>
-                <text x="80" y="70"  class="section-text" style="fill:var(--cor-acougue)">AÇOUGUE</text>
-                <text x="80" y="95"  class="sub-text">CARNES</text>
-            </g>
-            <g class="section" id="setor-frios"      onclick="MapRouter.tracarRota('Frios','Laticínios e Embutidos',80,240)">
-                <rect x="20" y="150" width="120" height="180" rx="6" style="stroke:var(--cor-frios)"/>
-                <text x="80" y="215" class="section-text" style="fill:var(--cor-frios)">FRIOS</text>
-                <text x="80" y="240" class="sub-text">LATICÍNIOS</text>
-                <text x="80" y="258" class="sub-text">QUEIJOS</text>
-            </g>
-            <g class="section" id="setor-hortifruti" onclick="MapRouter.tracarRota('Hortifruti','Frutas e Verduras',80,430)">
-                <rect x="20" y="340" width="120" height="180" rx="6" style="stroke:var(--cor-horti)"/>
-                <text x="80" y="405" class="section-text" style="fill:var(--cor-horti)">HORTIFRUTI</text>
-                <text x="80" y="430" class="sub-text">FRUTAS</text>
-                <text x="80" y="448" class="sub-text">VERDURAS</text>
-            </g>
-            <g class="section" id="setor-padaria"    onclick="MapRouter.tracarRota('Padaria','Pães e Bolos',80,620)">
-                <rect x="20" y="530" width="120" height="140" rx="6" style="stroke:var(--cor-padaria)"/>
-                <text x="80" y="585" class="section-text" style="fill:var(--cor-padaria)">PADARIA</text>
-                <text x="80" y="610" class="sub-text">PÃES QUENTES</text>
-            </g>
+<!-- ===== MAPA ===== -->
+<div id="tela-mapa" class="map-container">
+    <svg id="loja-svg" viewBox="0 0 1200 850" role="img" aria-label="Mapa interativo">
+        <rect class="floor" x="10" y="10" width="1180" height="830" rx="8" />
+        <g class="section" id="setor-acougue"    onclick="MapRouter.tracarRota('Açougue','Carnes Frescas',80,80)">
+            <rect x="20" y="20" width="120" height="120" rx="6" style="stroke:var(--cor-acougue)"/>
+            <text x="80" y="70"  class="section-text" style="fill:var(--cor-acougue)">AÇOUGUE</text>
+            <text x="80" y="95"  class="sub-text">CARNES</text>
+        </g>
+        <g class="section" id="setor-frios"      onclick="MapRouter.tracarRota('Frios','Laticínios e Embutidos',80,240)">
+            <rect x="20" y="150" width="120" height="180" rx="6" style="stroke:var(--cor-frios)"/>
+            <text x="80" y="215" class="section-text" style="fill:var(--cor-frios)">FRIOS</text>
+            <text x="80" y="240" class="sub-text">LATICÍNIOS</text>
+            <text x="80" y="258" class="sub-text">QUEIJOS</text>
+        </g>
+        <g class="section" id="setor-hortifruti" onclick="MapRouter.tracarRota('Hortifruti','Frutas e Verduras',80,430)">
+            <rect x="20" y="340" width="120" height="180" rx="6" style="stroke:var(--cor-horti)"/>
+            <text x="80" y="405" class="section-text" style="fill:var(--cor-horti)">HORTIFRUTI</text>
+            <text x="80" y="430" class="sub-text">FRUTAS</text>
+            <text x="80" y="448" class="sub-text">VERDURAS</text>
+        </g>
+        <g class="section" id="setor-padaria"    onclick="MapRouter.tracarRota('Padaria','Pães e Bolos',80,620)">
+            <rect x="20" y="530" width="120" height="140" rx="6" style="stroke:var(--cor-padaria)"/>
+            <text x="80" y="585" class="section-text" style="fill:var(--cor-padaria)">PADARIA</text>
+            <text x="80" y="610" class="sub-text">PÃES QUENTES</text>
+        </g>
+        <g class="section" id="setor-bebidas"    onclick="MapRouter.tracarRota('Bebidas','Águas, Sucos e Refri',1120,160)">
+            <rect x="1060" y="20" width="120" height="280" rx="6" style="stroke:var(--cor-b)"/>
+            <text x="1120" y="140" class="section-text" style="fill:var(--cor-b)">BEBIDAS</text>
+            <text x="1120" y="168" class="sub-text">ÁGUAS & SUCOS</text>
+        </g>
+        <g class="section" id="setor-adega"      onclick="MapRouter.tracarRota('Adega','Vinhos e Destilados',1120,380)">
+            <rect x="1060" y="310" width="120" height="140" rx="6" style="stroke:var(--cor-d)"/>
+            <text x="1120" y="375" class="section-text" style="fill:var(--cor-d)">ADEGA</text>
+            <text x="1120" y="400" class="sub-text">VINHOS</text>
+        </g>
+        <g class="section" id="setor-deposito"   onclick="MapRouter.tracarRota('Depósito','Acesso Restrito',1120,520)">
+            <rect x="1060" y="460" width="120" height="120" rx="6"/>
+            <text x="1120" y="515" class="section-text">DEPÓSITO</text>
+            <text x="1120" y="540" class="sub-text">RESTRITO</text>
+        </g>
+        <g class="section" id="setor-sanitarios" onclick="MapRouter.tracarRota('Sanitários','WC Clientes',1120,640)">
+            <rect x="1060" y="590" width="120" height="80" rx="6"/>
+            <text x="1120" y="630" class="section-text">WC</text>
+        </g>
+        <g id="corredores-dinamicos"></g>
+        <rect x="150" y="350" width="900" height="40" fill="var(--bg-body)" />
+        <g id="area-caixas">
+            <rect x="540" y="760" width="120" height="70" fill="var(--bg-surface)" stroke="var(--cor-horti)" stroke-width="2" rx="4"/>
+            <text x="600" y="790" fill="var(--cor-horti)" font-size="13" font-weight="bold" text-anchor="middle">ENTRADA</text>
+            <text x="600" y="810" fill="var(--cor-horti)" font-size="10" text-anchor="middle">▼ SAÍDA</text>
+            <g id="caixas-dinamicos"></g>
+        </g>
+        <path id="rota-ativa" class="route-path" d=""/>
+        <circle id="ponto-inicio" class="node-start" r="6"  cx="0" cy="0" style="display:none"/>
+        <circle id="ponto-fim"    class="node-end"   r="8"  cx="0" cy="0" style="display:none"/>
+    </svg>
+    <aside class="info-panel" id="info-panel" aria-live="polite">
+        <button class="close-btn" onclick="MapRouter.limparRota()">✖</button>
+        <span class="info-label">Destino Selecionado</span>
+        <h3 id="info-titulo">--</h3>
+        <p  id="info-desc">--</p>
+    </aside>
+    <div class="mapa-legenda so-funcionario" style="display:none">
+        <div class="legenda-item"><span class="legenda-dot vencido"></span> Produto vencido</div>
+        <div class="legenda-item"><span class="legenda-dot atencao"></span> Vence em 30 dias</div>
+        <div class="legenda-item"><span class="legenda-dot ok"></span> OK</div>
+    </div>
+</div>
 
-            <g class="section" id="setor-bebidas"    onclick="MapRouter.tracarRota('Bebidas','Águas, Sucos e Refri',1120,160)">
-                <rect x="1060" y="20" width="120" height="280" rx="6" style="stroke:var(--cor-b)"/>
-                <text x="1120" y="140" class="section-text" style="fill:var(--cor-b)">BEBIDAS</text>
-                <text x="1120" y="168" class="sub-text">ÁGUAS & SUCOS</text>
-            </g>
-            <g class="section" id="setor-adega"      onclick="MapRouter.tracarRota('Adega','Vinhos e Destilados',1120,380)">
-                <rect x="1060" y="310" width="120" height="140" rx="6" style="stroke:var(--cor-d)"/>
-                <text x="1120" y="375" class="section-text" style="fill:var(--cor-d)">ADEGA</text>
-                <text x="1120" y="400" class="sub-text">VINHOS</text>
-            </g>
-            <g class="section" id="setor-deposito"   onclick="MapRouter.tracarRota('Depósito','Acesso Restrito',1120,520)">
-                <rect x="1060" y="460" width="120" height="120" rx="6"/>
-                <text x="1120" y="515" class="section-text">DEPÓSITO</text>
-                <text x="1120" y="540" class="sub-text">RESTRITO</text>
-            </g>
-            <g class="section" id="setor-sanitarios" onclick="MapRouter.tracarRota('Sanitários','WC Clientes',1120,640)">
-                <rect x="1060" y="590" width="120" height="80" rx="6"/>
-                <text x="1120" y="630" class="section-text">WC</text>
-            </g>
+<!-- ===== PRODUTOS ===== -->
+<div id="tela-produtos" style="display:none;">
+    <div class="produtos-toolbar">
+        <input type="text" class="input-busca" id="campo-busca"
+               placeholder="🔍 Buscar por nome, código, empresa ou gôndola..."
+               oninput="ListaProdutos.buscar(this.value)" />
+        <button class="btn-primario so-admin"   style="display:none" onclick="Cadastro.abrirFormulario()">+ Novo Produto</button>
+        <button class="btn-secundario so-admin" style="display:none" onclick="DB.exportarExcel()">⬇ Excel</button>
+        <button class="btn-secundario so-admin" style="display:none" onclick="DB.exportarJSON()">⬇ JSON</button>
+        <button class="btn-secundario so-admin" style="display:none" onclick="document.getElementById('input-importar').click()">⬆ Importar</button>
+        <input type="file" id="input-importar" accept=".json,.xlsx" style="display:none" onchange="App.importar(this)"/>
+    </div>
+    <div id="lista-produtos"></div>
+</div>
 
-            <g id="corredores-dinamicos"></g>
-            <rect x="150" y="350" width="900" height="40" fill="var(--bg-body)" />
-
-            <g id="area-caixas">
-                <rect x="540" y="760" width="120" height="70" fill="var(--bg-surface)" stroke="var(--cor-horti)" stroke-width="2" rx="4"/>
-                <text x="600" y="790" fill="var(--cor-horti)" font-size="13" font-weight="bold" text-anchor="middle">ENTRADA</text>
-                <text x="600" y="810" fill="var(--cor-horti)" font-size="10" text-anchor="middle">▼ SAÍDA</text>
-                <g id="caixas-dinamicos"></g>
-            </g>
-
-            <path id="rota-ativa" class="route-path" d=""/>
-            <circle id="ponto-inicio" class="node-start" r="6"  cx="0" cy="0" style="display:none"/>
-            <circle id="ponto-fim"    class="node-end"   r="8"  cx="0" cy="0" style="display:none"/>
-        </svg>
-
-        <aside class="info-panel" id="info-panel" aria-live="polite">
-            <button class="close-btn" onclick="MapRouter.limparRota()">✖</button>
-            <span class="info-label">Destino Selecionado</span>
-            <h3 id="info-titulo">--</h3>
-            <p  id="info-desc">--</p>
-        </aside>
-
-        <!-- Legenda visível apenas no modo funcionário -->
-        <div class="mapa-legenda so-funcionario" style="display:none">
-            <div class="legenda-item"><span class="legenda-dot vencido"></span> Produto vencido</div>
-            <div class="legenda-item"><span class="legenda-dot atencao"></span> Vence em 30 dias</div>
-            <div class="legenda-item"><span class="legenda-dot ok"></span> OK</div>
+<!-- ===== CAIXA ===== -->
+<div id="tela-caixa">
+    <div class="caixa-esquerda">
+        <!-- Busca -->
+        <div class="caixa-busca-wrap">
+            <input type="text" id="caixa-busca" class="caixa-busca-input"
+                   placeholder="🔍 Digite o código (PRD001) ou nome do produto..."
+                   oninput="Caixa.buscarProduto(this.value)"
+                   onkeydown="if(event.key==='Escape'){this.value='';Caixa.buscarProduto('')}" />
+            <div id="caixa-resultados"></div>
+        </div>
+        <!-- Carrinho -->
+        <div class="caixa-carrinho-wrap">
+            <div class="caixa-carrinho-titulo">🛒 Carrinho</div>
+            <div id="caixa-carrinho"></div>
         </div>
     </div>
 
-    <!-- ===== PRODUTOS ===== -->
-    <div id="tela-produtos" style="display:none;">
-        <div class="produtos-toolbar">
-            <input type="text" class="input-busca" id="campo-busca"
-                   placeholder="🔍 Buscar por nome, código, empresa ou gôndola..."
-                   oninput="ListaProdutos.buscar(this.value)" />
-            <button class="btn-primario so-funcionario"   style="display:none" onclick="Cadastro.abrirFormulario()">+ Novo Produto</button>
-            <button class="btn-secundario so-funcionario" style="display:none" onclick="DB.exportarExcel()">⬇ Excel</button>
-            <button class="btn-secundario so-funcionario" style="display:none" onclick="DB.exportarJSON()">⬇ JSON</button>
-            <button class="btn-secundario so-funcionario" style="display:none" onclick="document.getElementById('input-importar').click()">⬆ Importar</button>
-            <input type="file" id="input-importar" accept=".json,.xlsx" style="display:none" onchange="App.importar(this)"/>
-        </div>
-        <div id="lista-produtos"></div>
-    </div>
+    <!-- Painel de pagamento -->
+    <div class="caixa-direita">
+        <div class="caixa-pagamento-box">
+            <div class="caixa-pagamento-titulo">💳 Pagamento</div>
 
-    <!-- ===== DASHBOARD ===== -->
-    <div id="tela-dashboard" style="display:none;"></div>
-
-    <!-- ===== MODAL CADASTRO ===== -->
-    <div class="modal-overlay" id="modal-cadastro">
-        <div class="modal-box">
-            <div class="modal-header">
-                <h2 id="modal-titulo">Novo Produto</h2>
-                <button class="modal-close" onclick="Cadastro.fecharFormulario()">✕</button>
+            <div class="caixa-total-display">
+                <div class="caixa-total-label">Total a Pagar</div>
+                <div id="caixa-total">R$ 0,00</div>
             </div>
-            <div class="modal-body" id="form-produto">
 
-                <div class="form-secao">
-                    <div class="form-secao-titulo">Identificação</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Código</label>
-                            <input id="campo-id" type="text" readonly/>
-                        </div>
-                        <div class="form-group">
-                            <label>Empresa Fabricante</label>
-                            <input id="campo-empresa" type="text" placeholder="Ex: Nestlé"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Nome do Produto</label>
-                        <input id="campo-nome" type="text" placeholder="Ex: Arroz Tipo 1 5kg"/>
-                    </div>
+            <!-- Forma de pagamento -->
+            <div>
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Forma de Pagamento</div>
+                <div class="pagamento-opcoes">
+                    <button class="pag-opt selecionado" onclick="App.selecionarPagamento('dinheiro',this)">💵 Dinheiro</button>
+                    <button class="pag-opt" onclick="App.selecionarPagamento('cartao_debito',this)">💳 Débito</button>
+                    <button class="pag-opt" onclick="App.selecionarPagamento('cartao_credito',this)">💳 Crédito</button>
+                    <button class="pag-opt" onclick="App.selecionarPagamento('pix',this)">⚡ PIX</button>
                 </div>
-
-                <div class="form-secao">
-                    <div class="form-secao-titulo">Valores</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Valor de Compra (R$)</label>
-                            <input id="campo-valor-compra" type="number" step="0.01" min="0" placeholder="0,00"/>
-                        </div>
-                        <div class="form-group">
-                            <label>Valor de Venda (R$)</label>
-                            <input id="campo-valor-venda" type="number" step="0.01" min="0" placeholder="0,00"/>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-secao">
-                    <div class="form-secao-titulo">📍 Endereço na Loja</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Corredor</label>
-                            <input id="campo-loja-corredor" type="text" placeholder="Ex: A, B, C..."/>
-                        </div>
-                        <div class="form-group">
-                            <label>Gôndola / Prateleira</label>
-                            <input id="campo-loja-gondola" type="text" placeholder="Ex: A3, B7..."/>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-secao">
-                    <div class="form-secao-titulo">🏭 Endereço no Depósito</div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Corredor</label>
-                            <input id="campo-dep-corredor" type="text" placeholder="Ex: D1, D2..."/>
-                        </div>
-                        <div class="form-group">
-                            <label>Armário</label>
-                            <input id="campo-dep-armario" type="text" placeholder="Ex: 1, 2..."/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Prateleira</label>
-                        <input id="campo-dep-prateleira" type="text" placeholder="Ex: A, B..."/>
-                    </div>
-                </div>
-
-                <!-- VALIDADES -->
-                <div class="form-secao">
-                    <div class="form-secao-titulo">📅 Lotes de Validade</div>
-                    <div id="lista-validades-form"></div>
-                    <div class="val-add-row">
-                        <div class="form-group" style="flex:1">
-                            <label>Data de Validade</label>
-                            <input id="nova-val-data" type="date"/>
-                        </div>
-                        <div class="form-group" style="flex:1">
-                            <label>Quantidade do Lote</label>
-                            <input id="nova-val-qtd" type="number" min="1" placeholder="0"/>
-                        </div>
-                        <button class="btn-primario" style="align-self:flex-end;white-space:nowrap"
-                                onclick="Cadastro.adicionarValidadeForm()">+ Adicionar</button>
-                    </div>
-                </div>
-
             </div>
-            <div class="modal-footer">
-                <button class="btn-secundario" onclick="Cadastro.fecharFormulario()">Cancelar</button>
-                <button class="btn-primario"   onclick="Cadastro.salvarFormulario()">💾 Salvar Produto</button>
+
+            <!-- Valor pago / troco (só para dinheiro) -->
+            <div id="wrap-troco" class="pago-wrap">
+                <label>Valor Recebido (R$)</label>
+                <input id="caixa-pago" class="pago-input" type="number" step="0.01" min="0"
+                       placeholder="0,00" oninput="Caixa.calcularTroco()" />
+                <div class="troco-display">
+                    <span class="troco-label">Troco</span>
+                    <span id="caixa-troco">—</span>
+                </div>
             </div>
+
+            <button class="btn-finalizar" onclick="Caixa.finalizarVenda()">✅ Finalizar Venda</button>
+            <button class="btn-limpar-caixa" onclick="App.limparCaixa()">🗑️ Limpar Carrinho</button>
         </div>
     </div>
+</div>
 
-    <div id="toast"></div>
+<!-- ===== DASHBOARD ===== -->
+<div id="tela-dashboard" style="display:none;"></div>
 
-    <script src="js/map.config.js"></script>
-    <script src="js/db.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/map.builder.js"></script>
-    <script src="js/map.router.js"></script>
-    <script src="js/cadastro.js"></script>
-    <script>
-        const App = {
-            _abaAtual: 'mapa',
+<!-- ===== MODAL CADASTRO ===== -->
+<div class="modal-overlay" id="modal-cadastro">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h2 id="modal-titulo">Novo Produto</h2>
+            <button class="modal-close" onclick="Cadastro.fecharFormulario()">✕</button>
+        </div>
+        <div class="modal-body" id="form-produto">
+            <div class="form-secao">
+                <div class="form-secao-titulo">Identificação</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Código</label><input id="campo-id" type="text" readonly/></div>
+                    <div class="form-group"><label>Empresa</label><input id="campo-empresa" type="text" placeholder="Ex: Nestlé"/></div>
+                </div>
+                <div class="form-group"><label>Nome do Produto</label><input id="campo-nome" type="text" placeholder="Ex: Arroz Tipo 1 5kg"/></div>
+            </div>
+            <div class="form-secao">
+                <div class="form-secao-titulo">Valores</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Valor de Compra (R$)</label><input id="campo-valor-compra" type="number" step="0.01" min="0" placeholder="0,00"/></div>
+                    <div class="form-group"><label>Valor de Venda (R$)</label><input id="campo-valor-venda" type="number" step="0.01" min="0" placeholder="0,00"/></div>
+                </div>
+            </div>
+            <div class="form-secao">
+                <div class="form-secao-titulo">📍 Endereço na Loja</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Corredor</label><input id="campo-loja-corredor" type="text" placeholder="Ex: A, B..."/></div>
+                    <div class="form-group"><label>Gôndola</label><input id="campo-loja-gondola" type="text" placeholder="Ex: A3, B7..."/></div>
+                </div>
+            </div>
+            <div class="form-secao">
+                <div class="form-secao-titulo">🏭 Endereço no Depósito</div>
+                <div class="form-row">
+                    <div class="form-group"><label>Corredor</label><input id="campo-dep-corredor" type="text" placeholder="Ex: D1..."/></div>
+                    <div class="form-group"><label>Armário</label><input id="campo-dep-armario" type="text" placeholder="Ex: 1, 2..."/></div>
+                </div>
+                <div class="form-group"><label>Prateleira</label><input id="campo-dep-prateleira" type="text" placeholder="Ex: A, B..."/></div>
+            </div>
+            <div class="form-secao">
+                <div class="form-secao-titulo">📅 Lotes de Validade</div>
+                <div id="lista-validades-form"></div>
+                <div class="val-add-row">
+                    <div class="form-group" style="flex:1"><label>Data de Validade</label><input id="nova-val-data" type="date"/></div>
+                    <div class="form-group" style="flex:1"><label>Quantidade do Lote</label><input id="nova-val-qtd" type="number" min="1" placeholder="0"/></div>
+                    <button class="btn-primario" style="align-self:flex-end;white-space:nowrap" onclick="Cadastro.adicionarValidadeForm()">+ Adicionar</button>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secundario" onclick="Cadastro.fecharFormulario()">Cancelar</button>
+            <button class="btn-primario"   onclick="Cadastro.salvarFormulario()">💾 Salvar Produto</button>
+        </div>
+    </div>
+</div>
 
-            mudarAba(aba) {
-                this._abaAtual = aba;
-                ['mapa','produtos','dashboard'].forEach(a => {
-                    const el = document.getElementById(`tela-${a}`);
-                    if (el) el.style.display = a === aba ? '' : 'none';
-                });
-                document.querySelectorAll('.tab-btn').forEach((btn, i) => {
-                    btn.classList.toggle('ativo',
-                        (i===0 && aba==='mapa') || (i===1 && aba==='produtos') || (i===2 && aba==='dashboard'));
-                });
-                if (aba === 'produtos')   ListaProdutos.renderizar();
-                if (aba === 'dashboard')  Dashboard.renderizar();
-            },
+<!-- ===== MODAL RECIBO ===== -->
+<div id="modal-recibo">
+    <div class="recibo-box">
+        <div class="recibo-acoes">
+            <button class="btn-imprimir" onclick="Caixa.imprimirRecibo()">🖨️ Imprimir</button>
+            <button class="btn-fechar-recibo" onclick="Caixa.fecharRecibo()">✕ Fechar</button>
+        </div>
+        <div id="recibo-conteudo"></div>
+    </div>
+</div>
 
-            irParaMapa(gondola, nomeProduto) {
-                this.mudarAba('mapa');
-                if (!gondola) return;
-                setTimeout(() => {
-                    const corredor = gondola.charAt(0);
-                    const config   = LOJA_CONFIG.corredores.find(c => c.id === corredor);
-                    if (!config) return;
-                    const num    = parseInt(gondola.slice(1));
-                    const metade = LOJA_CONFIG.prateleirasPorCorredor / 2;
-                    const yPos   = num <= metade ? 80 + (num-1)*52 : 410 + (num-metade-1)*52;
-                    MapRouter.tracarRota(`Corredor ${corredor}`, nomeProduto, config.x+45, yPos+20, gondola);
-                }, 50);
-            },
+<div id="toast"></div>
 
-            // Chamado pelo botão "Ver na lista de produtos →" no painel do mapa
-            filtrarProdutos(gondola, titulo) {
-                this.mudarAba('produtos');
-                setTimeout(() => {
-                    // Busca pela gôndola (ex: "A3") se disponível, senão pelo título do setor
-                    const termo = gondola || titulo;
-                    const campo = document.getElementById('campo-busca');
-                    campo.value = termo;
-                    ListaProdutos.buscar(termo);
-                }, 50);
-            },
+<script src="js/map.config.js"></script>
+<script src="js/db.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/map.builder.js"></script>
+<script src="js/map.router.js"></script>
+<script src="js/cadastro.js"></script>
+<script src="js/caixa.js"></script>
+<script>
+const App = {
+    _abaAtual: 'mapa',
+    _pagamento: 'dinheiro',
 
-            importar(input) {
-                const file = input.files[0]; if (!file) return;
-                const cb = (ok, qtd) => {
-                    input.value = '';
-                    if (ok) { ListaProdutos.renderizar(); alert(`✅ ${qtd} produtos importados!`); }
-                    else    { alert('❌ Erro ao importar. Verifique o arquivo.'); }
-                };
-                if (file.name.endsWith('.json')) DB.importarJSON(file, cb);
-                else DB.importarExcel(file, cb);
+    mudarAba(aba) {
+        this._abaAtual = aba;
+        ['mapa','produtos','caixa','dashboard'].forEach(a => {
+            const el = document.getElementById(`tela-${a}`);
+            if (!el) return;
+            if (a === 'caixa') {
+                el.classList.toggle('visivel', a === aba);
+            } else {
+                el.style.display = a === aba ? '' : 'none';
             }
+        });
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
+        const abas = ['mapa','produtos','caixa','dashboard'];
+        const idx  = abas.indexOf(aba);
+        const btns = document.querySelectorAll('.tab-btn');
+        // Marca o botão da aba visível correspondente
+        btns.forEach(btn => {
+            const onclick = btn.getAttribute('onclick') || '';
+            if (onclick.includes(`'${aba}'`)) btn.classList.add('ativo');
+        });
+        if (aba === 'produtos')  ListaProdutos.renderizar();
+        if (aba === 'dashboard') Dashboard.renderizar();
+        if (aba === 'caixa')     Caixa.init();
+    },
+
+    selecionarPagamento(tipo, btn) {
+        this._pagamento = tipo;
+        document.querySelectorAll('.pag-opt').forEach(b => b.classList.remove('selecionado'));
+        btn.classList.add('selecionado');
+        document.getElementById('caixa-pagamento-hidden').value = tipo;
+        // Mostra/esconde campo de troco
+        const wrap = document.getElementById('wrap-troco');
+        wrap.style.display = tipo === 'dinheiro' ? '' : 'none';
+    },
+
+    limparCaixa() {
+        if (!confirm('Limpar o carrinho?')) return;
+        Caixa._carrinho = [];
+        Caixa.init();
+    },
+
+    irParaMapa(gondola, nomeProduto) {
+        this.mudarAba('mapa');
+        if (!gondola) return;
+        setTimeout(() => {
+            const corredor = gondola.charAt(0);
+            const config   = LOJA_CONFIG.corredores.find(c => c.id === corredor);
+            if (!config) return;
+            const num    = parseInt(gondola.slice(1));
+            const metade = LOJA_CONFIG.prateleirasPorCorredor / 2;
+            const yPos   = num <= metade ? 80+(num-1)*52 : 410+(num-metade-1)*52;
+            MapRouter.tracarRota(`Corredor ${corredor}`, nomeProduto, config.x+45, yPos+20, gondola);
+        }, 50);
+    },
+
+    filtrarProdutos(gondola, titulo) {
+        this.mudarAba('produtos');
+        setTimeout(() => {
+            const termo = gondola || titulo;
+            const campo = document.getElementById('campo-busca');
+            campo.value = termo;
+            ListaProdutos.buscar(termo);
+        }, 50);
+    },
+
+    importar(input) {
+        const file = input.files[0]; if (!file) return;
+        const cb = (ok, qtd) => {
+            input.value = '';
+            if (ok) { ListaProdutos.renderizar(); alert(`✅ ${qtd} produtos importados!`); }
+            else    { alert('❌ Erro ao importar.'); }
         };
+        if (file.name.endsWith('.json')) DB.importarJSON(file, cb);
+        else DB.importarExcel(file, cb);
+    }
+};
 
-        document.addEventListener('modoAlterado', (e) => {
-            const aba = App._abaAtual;
-            if (aba === 'produtos')  ListaProdutos.renderizar();
-            if (aba === 'dashboard') Dashboard.renderizar();
-            // Atualiza indicadores visuais no mapa sempre que o modo muda
-            MapBuilder.atualizarIndicadoresValidade(e.detail.funcionario);
-        });
+// Input hidden para o tipo de pagamento
+document.addEventListener('DOMContentLoaded', () => {
+    // Cria input hidden para o caixa ler o tipo de pagamento
+    const inp = document.createElement('input');
+    inp.type = 'hidden'; inp.id = 'caixa-pagamento-hidden'; inp.value = 'dinheiro';
+    document.body.appendChild(inp);
 
-        document.addEventListener('DOMContentLoaded', () => {
-            MapBuilder.init();
-            MapRouter.init();
-        });
-    </script>
+    // Patch no Caixa para ler o pagamento correto
+    const origFinalizar = Caixa.finalizarVenda.bind(Caixa);
+
+    MapBuilder.init();
+    MapRouter.init();
+
+    // Mostra login overlay
+    document.getElementById('login-overlay').classList.remove('oculto');
+});
+
+// Quando o perfil muda
+document.addEventListener('perfilAlterado', (e) => {
+    const perfil = e.detail.perfil;
+
+    // Esconde overlay de login
+    document.getElementById('login-overlay').classList.add('oculto');
+
+    // Atualiza visibilidade dos elementos .so-admin
+    document.querySelectorAll('.so-admin').forEach(el => {
+        el.style.display = perfil === 'admin' ? '' : 'none';
+    });
+
+    // Atualiza indicadores do mapa
+    MapBuilder.atualizarIndicadoresValidade(perfil !== 'cliente');
+
+    // Se for cliente, garante que está na aba mapa
+    if (perfil === 'cliente') App.mudarAba('mapa');
+    // Se for caixa, vai direto para o caixa
+    if (perfil === 'caixa')   App.mudarAba('caixa');
+    // Atualiza a lista se estiver na aba produtos
+    if (App._abaAtual === 'produtos') ListaProdutos.renderizar();
+    if (App._abaAtual === 'dashboard') Dashboard.renderizar();
+});
+</script>
 </body>
 </html>
