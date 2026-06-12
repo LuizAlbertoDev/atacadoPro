@@ -32,11 +32,11 @@ const Auth = (() => {
     }
 
     function abrirModal() {
-        document.getElementById('modal-login').classList.add('aberto');
+        document.getElementById('login-overlay')?.classList.remove('oculto');
     }
 
     function _fecharModal() {
-        document.getElementById('modal-login').classList.remove('aberto');
+        document.getElementById('login-overlay')?.classList.add('oculto');
     }
 
     function _atualizarUI() {

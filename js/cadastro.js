@@ -257,18 +257,28 @@ const ListaProdutos = (() => {
 // DASHBOARD
 // ============================================================
 const Dashboard = (() => {
+    let _aba = 'resumo';
+    const _filtros = {
+        status: 'vencido',
+        busca: '',
+        depCorredor: '',
+        depArmario: '',
+        depPrateleira: '',
+        lojaCorredor: '',
+        ordem: 'validade',
+    };
+
     function renderizar() {
         const container = document.getElementById('tela-dashboard');
         if (!container) return;
 
-        const todos   = DB.listar();
-        const hoje    = new Date();
-        const em30    = new Date(); em30.setDate(em30.getDate() + 30);
+        const todos = DB.listar();
+        const rows = _montarLinhasValidade(todos);
+        const vencidos = rows.filter(r => r.status === 'vencido');
+        const vencendo30 = rows.filter(r => r.status === 'atencao');
 
         let totalProdutos  = todos.length;
         let totalItens     = 0;
-        let vencidos       = [];
-        let vencendo30     = [];
         let totalValor     = 0;
 
         todos.forEach(p => {
@@ -276,13 +286,15 @@ const Dashboard = (() => {
             validades.forEach(v => {
                 totalItens += v.quantidade;
                 totalValor += v.quantidade * p.valorVenda;
-                const d = new Date(v.data + 'T00:00:00');
-                if (d < hoje)  vencidos.push({ produto: p, lote: v });
-                else if (d <= em30) vencendo30.push({ produto: p, lote: v });
             });
         });
 
         container.innerHTML = `
+        <div class="dash-tabs dash-print-hide">
+            <button class="dash-tab ${_aba === 'resumo' ? 'ativo' : ''}" onclick="Dashboard.mudarAba('resumo')">Resumo</button>
+            <button class="dash-tab ${_aba === 'validade' ? 'ativo' : ''}" onclick="Dashboard.mudarAba('validade')">Validades e Vencidos</button>
+        </div>
+
         <!-- Cards de resumo -->
         <div class="dash-cards">
             <div class="dash-card">
@@ -322,57 +334,98 @@ const Dashboard = (() => {
             </div>
         </div>
 
+        ${_aba === 'validade' ? _renderizarValidades(rows) : _renderizarResumo(vencidos, vencendo30, todos)}
+        `;
+    }
+
+    function _renderizarResumo(vencidos, vencendo30, todos) {
+        return `
         <!-- Alertas de validade -->
         <div class="dash-secoes">
             <div class="dash-secao">
                 <div class="dash-secao-titulo">🚨 Lotes Vencidos (${vencidos.length})</div>
                 ${vencidos.length === 0
                     ? `<div class="dash-vazia">Nenhum lote vencido. ✅</div>`
-                    : vencidos.map(({ produto: p, lote: v }) => _loteCard(p, v, 'vencido')).join('')
+                    : vencidos.slice(0, 8).map(({ p, v, status }) => _loteCard(p, v, status)).join('')
                 }
+                ${vencidos.length > 8 ? `<button class="btn-ver-todos dash-btn-link" onclick="Dashboard.abrirValidades('vencido')">Ver todos os vencidos</button>` : ''}
             </div>
             <div class="dash-secao">
                 <div class="dash-secao-titulo">⚠️ Vencem nos Próximos 30 Dias (${vencendo30.length})</div>
                 ${vencendo30.length === 0
                     ? `<div class="dash-vazia">Nenhum lote vencendo em breve. ✅</div>`
-                    : vencendo30.map(({ produto: p, lote: v }) => _loteCard(p, v, 'atencao')).join('')
+                    : vencendo30.slice(0, 8).map(({ p, v, status }) => _loteCard(p, v, status)).join('')
                 }
+                ${vencendo30.length > 8 ? `<button class="btn-ver-todos dash-btn-link" onclick="Dashboard.abrirValidades('atencao')">Ver todos os alertas</button>` : ''}
             </div>
         </div>
 
-        <!-- Tabela geral de validades -->
-        <div class="dash-tabela-wrap">
-            <div class="dash-secao-titulo">📋 Todos os Lotes por Validade</div>
-            <table class="dash-tabela">
+        `;
+    }
+
+    function _renderizarValidades(rows) {
+        const filtradas = _filtrarOrdenarLinhas(rows);
+        const opts = _opcoesFiltros(rows);
+        const totalQtd = filtradas.reduce((s, r) => s + r.v.quantidade, 0);
+        const totalValor = filtradas.reduce((s, r) => s + (r.v.quantidade * r.p.valorVenda), 0);
+
+        return `
+        <div class="dash-validade dash-print-area">
+            <div class="dash-validade-header">
+                <div>
+                    <div class="dash-secao-titulo">Relatório de Validades</div>
+                    <div class="dash-relatorio-sub">${filtradas.length} lote(s) · ${totalQtd.toLocaleString('pt-BR')} unidade(s) · R$ ${totalValor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
+                </div>
+                <button class="btn-secundario dash-print-hide" onclick="Dashboard.imprimirValidades()">Imprimir</button>
+            </div>
+
+            <div class="dash-filtros dash-print-hide">
+                <input class="dash-filtro-input" type="text" value="${_escapeAttr(_filtros.busca)}" placeholder="Buscar produto, código ou empresa..." oninput="Dashboard.atualizarFiltro('busca', this.value)" />
+                ${_selectFiltro('status', 'Status', [
+                    ['vencido', 'Vencidos'],
+                    ['atencao', 'Vencem em 30 dias'],
+                    ['ok', 'OK'],
+                    ['todos', 'Todos'],
+                ])}
+                ${_selectFiltro('depCorredor', 'Depósito', opts.depCorredor)}
+                ${_selectFiltro('depArmario', 'Armário', opts.depArmario)}
+                ${_selectFiltro('depPrateleira', 'Prateleira', opts.depPrateleira)}
+                ${_selectFiltro('lojaCorredor', 'Corredor loja', opts.lojaCorredor)}
+                ${_selectFiltro('ordem', 'Ordenar', [
+                    ['validade', 'Validade mais próxima'],
+                    ['produto', 'Produto A-Z'],
+                    ['empresa', 'Empresa A-Z'],
+                    ['deposito', 'Depósito'],
+                    ['quantidade', 'Maior quantidade'],
+                    ['status', 'Status crítico'],
+                ])}
+            </div>
+
+            <table class="dash-tabela dash-relatorio-tabela">
                 <thead>
                     <tr>
-                        <th>Código</th><th>Produto</th><th>Empresa</th>
-                        <th>Data Validade</th><th>Qtd</th><th>Status</th><th>Ação</th>
+                        <th>Status</th>
+                        <th>Validade</th>
+                        <th>Código</th>
+                        <th>Produto</th>
+                        <th>Empresa</th>
+                        <th>Qtd</th>
+                        <th>Loja</th>
+                        <th>Depósito</th>
+                        <th class="dash-print-hide">Ação</th>
                     </tr>
                 </thead>
                 <tbody>
-                ${_todosSortedPorValidade(todos).map(({ p, v }) => {
-                    const s = DB.statusValidade(v.data);
-                    const dias = Math.floor((new Date(v.data) - hoje) / 86400000);
-                    return `<tr class="dash-tr-${s}">
-                        <td><span class="produto-id">${p.id}</span></td>
-                        <td>${p.nome}</td>
-                        <td>${p.empresa}</td>
-                        <td>${v.data}</td>
-                        <td>${v.quantidade} un.</td>
-                        <td><span class="badge-validade ${s}">${s === 'vencido' ? `Vencido há ${Math.abs(dias)}d` : s === 'atencao' ? `${dias}d` : 'OK'}</span></td>
-                        <td>
-                            <button class="btn-acao excluir" onclick="Dashboard.excluirLote('${p.id}','${v.id}')" title="Excluir lote">🗑️</button>
-                        </td>
-                    </tr>`;
-                }).join('')}
+                    ${filtradas.length === 0 ? `
+                    <tr><td colspan="9" class="dash-vazia">Nenhum lote encontrado com os filtros atuais.</td></tr>
+                    ` : filtradas.map(r => _linhaRelatorio(r)).join('')}
                 </tbody>
             </table>
         </div>`;
     }
 
     function _loteCard(p, v, status) {
-        const dias = Math.floor((new Date(v.data) - new Date()) / 86400000);
+        const dias = _diasAte(v.data);
         return `
         <div class="dash-lote-card ${status}">
             <div class="dash-lote-topo">
@@ -390,10 +443,125 @@ const Dashboard = (() => {
         </div>`;
     }
 
-    function _todosSortedPorValidade(todos) {
+    function _montarLinhasValidade(todos) {
         const rows = [];
-        todos.forEach(p => (p.validades||[]).forEach(v => rows.push({ p, v })));
-        return rows.sort((a,b) => a.v.data.localeCompare(b.v.data));
+        todos.forEach(p => (p.validades || []).forEach(v => {
+            const status = DB.statusValidade(v.data);
+            rows.push({ p, v, status, dias: _diasAte(v.data) });
+        }));
+        return rows;
+    }
+
+    function _filtrarOrdenarLinhas(rows) {
+        const termo = _normalizar(_filtros.busca);
+        return rows.filter(r => {
+            const p = r.p;
+            if (_filtros.status !== 'todos' && r.status !== _filtros.status) return false;
+            if (_filtros.depCorredor && (p.deposito?.corredor || '') !== _filtros.depCorredor) return false;
+            if (_filtros.depArmario && (p.deposito?.armario || '') !== _filtros.depArmario) return false;
+            if (_filtros.depPrateleira && (p.deposito?.prateleira || '') !== _filtros.depPrateleira) return false;
+            if (_filtros.lojaCorredor && (p.loja?.corredor || '') !== _filtros.lojaCorredor) return false;
+            if (!termo) return true;
+            const texto = _normalizar(`${p.id} ${p.nome} ${p.empresa} ${p.loja?.gondola || ''} ${p.deposito?.corredor || ''} ${p.deposito?.armario || ''} ${p.deposito?.prateleira || ''}`);
+            return texto.includes(termo);
+        }).sort(_compararLinhas);
+    }
+
+    function _compararLinhas(a, b) {
+        const critico = { vencido: 0, atencao: 1, ok: 2 };
+        if (_filtros.ordem === 'produto') return a.p.nome.localeCompare(b.p.nome, 'pt-BR');
+        if (_filtros.ordem === 'empresa') return (a.p.empresa || '').localeCompare(b.p.empresa || '', 'pt-BR');
+        if (_filtros.ordem === 'deposito') {
+            return `${a.p.deposito?.corredor || ''}${a.p.deposito?.armario || ''}${a.p.deposito?.prateleira || ''}`.localeCompare(
+                `${b.p.deposito?.corredor || ''}${b.p.deposito?.armario || ''}${b.p.deposito?.prateleira || ''}`,
+                'pt-BR',
+                { numeric: true }
+            );
+        }
+        if (_filtros.ordem === 'quantidade') return b.v.quantidade - a.v.quantidade;
+        if (_filtros.ordem === 'status') return critico[a.status] - critico[b.status] || a.v.data.localeCompare(b.v.data);
+        return a.v.data.localeCompare(b.v.data);
+    }
+
+    function _opcoesFiltros(rows) {
+        return {
+            depCorredor: _opcoesUnicas(rows.map(r => r.p.deposito?.corredor)),
+            depArmario: _opcoesUnicas(rows.map(r => r.p.deposito?.armario)),
+            depPrateleira: _opcoesUnicas(rows.map(r => r.p.deposito?.prateleira)),
+            lojaCorredor: _opcoesUnicas(rows.map(r => r.p.loja?.corredor)),
+        };
+    }
+
+    function _opcoesUnicas(valores) {
+        return valores
+            .filter(Boolean)
+            .map(String)
+            .filter((v, i, arr) => arr.indexOf(v) === i)
+            .sort((a, b) => a.localeCompare(b, 'pt-BR', { numeric: true }))
+            .map(v => [v, v]);
+    }
+
+    function _selectFiltro(campo, label, opcoes) {
+        return `
+        <label class="dash-filtro">
+            <span>${label}</span>
+            <select onchange="Dashboard.atualizarFiltro('${campo}', this.value)">
+                ${campo === 'status' || campo === 'ordem' ? '' : `<option value="">Todos</option>`}
+                ${opcoes.map(([valor, texto]) => `<option value="${_escapeAttr(valor)}" ${_filtros[campo] === valor ? 'selected' : ''}>${texto}</option>`).join('')}
+            </select>
+        </label>`;
+    }
+
+    function _linhaRelatorio(r) {
+        const p = r.p;
+        const v = r.v;
+        const statusLabel = r.status === 'vencido' ? `Vencido há ${Math.abs(r.dias)}d` : r.status === 'atencao' ? `Vence em ${r.dias}d` : 'OK';
+        return `<tr class="dash-tr-${r.status}">
+            <td><span class="badge-validade ${r.status}">${statusLabel}</span></td>
+            <td>${v.data}</td>
+            <td><span class="produto-id">${p.id}</span></td>
+            <td>${p.nome}</td>
+            <td>${p.empresa || '—'}</td>
+            <td>${v.quantidade} un.</td>
+            <td>${p.loja?.corredor || '—'} · ${p.loja?.gondola || '—'}</td>
+            <td>Corr. ${p.deposito?.corredor || '—'} · Arm. ${p.deposito?.armario || '—'} · Prat. ${p.deposito?.prateleira || '—'}</td>
+            <td class="dash-print-hide"><button class="btn-acao excluir" onclick="Dashboard.excluirLote('${p.id}','${v.id}')" title="Excluir lote">🗑️</button></td>
+        </tr>`;
+    }
+
+    function _diasAte(data) {
+        const hoje = new Date();
+        hoje.setHours(0, 0, 0, 0);
+        return Math.floor((new Date(data + 'T00:00:00') - hoje) / 86400000);
+    }
+
+    function _normalizar(valor) {
+        return String(valor || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function _escapeAttr(valor) {
+        return String(valor || '').replace(/"/g, '&quot;');
+    }
+
+    function mudarAba(aba) {
+        _aba = aba;
+        if (aba === 'validade' && !_filtros.status) _filtros.status = 'vencido';
+        renderizar();
+    }
+
+    function abrirValidades(status = 'vencido') {
+        _aba = 'validade';
+        _filtros.status = status;
+        renderizar();
+    }
+
+    function atualizarFiltro(campo, valor) {
+        _filtros[campo] = valor;
+        renderizar();
+    }
+
+    function imprimirValidades() {
+        window.print();
     }
 
     function excluirLote(produtoId, validadeId) {
@@ -403,5 +571,5 @@ const Dashboard = (() => {
         if (App._abaAtual === 'produtos') ListaProdutos.renderizar();
     }
 
-    return { renderizar, excluirLote };
+    return { renderizar, mudarAba, abrirValidades, atualizarFiltro, imprimirValidades, excluirLote };
 })();

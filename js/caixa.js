@@ -7,6 +7,10 @@ const Caixa = (() => {
     let _carrinho = [];   // [{ produto, quantidade, desconto, subtotal }]
     let _vendas   = [];   // histórico em memória (pode ser persistido se quiser)
 
+    function _estoqueTotal(produto) {
+        return (produto.validades || []).reduce((s, v) => s + v.quantidade, 0);
+    }
+
     // ── BUSCA ─────────────────────────────────────────────────────────────
     function buscarProduto(termo) {
         if (!termo) { _renderBusca([]); return; }
@@ -23,14 +27,13 @@ const Caixa = (() => {
         if (!el) return;
         if (!lista.length) { el.innerHTML = ''; el.style.display = 'none'; return; }
 
-        const qtdTotal = p => (p.validades||[]).reduce((s,v)=>s+v.quantidade,0);
         el.innerHTML = lista.map(p => `
             <div class="caixa-resultado-item" onclick="Caixa.adicionarAoCarrinho('${p.id}')">
                 <span class="resultado-id">${p.id}</span>
                 <span class="resultado-nome">${p.nome}</span>
                 <span class="resultado-empresa">${p.empresa}</span>
                 <span class="resultado-preco">R$ ${p.valorVenda.toFixed(2).replace('.',',')}</span>
-                <span class="resultado-estoque ${qtdTotal(p)<=5?'alerta-estoque':''}">Estq: ${qtdTotal(p)}</span>
+                <span class="resultado-estoque ${_estoqueTotal(p)<=5?'alerta-estoque':''}">Estq: ${_estoqueTotal(p)}</span>
             </div>`).join('');
         el.style.display = 'block';
     }
@@ -44,7 +47,7 @@ const Caixa = (() => {
         const produto = DB.buscarPorId(produtoId);
         if (!produto) return;
 
-        const qtdTotal = (produto.validades||[]).reduce((s,v)=>s+v.quantidade,0);
+        const qtdTotal = _estoqueTotal(produto);
         if (qtdTotal <= 0) {
             _toast('Produto sem estoque!', 'erro');
             return;
@@ -52,6 +55,10 @@ const Caixa = (() => {
 
         const idx = _carrinho.findIndex(i => i.produto.id === produtoId);
         if (idx >= 0) {
+            if (_carrinho[idx].quantidade >= qtdTotal) {
+                _toast('Quantidade maior que o estoque disponível!', 'erro');
+                return;
+            }
             _carrinho[idx].quantidade++;
         } else {
             _carrinho.push({ produto, quantidade: 1, desconto: 0 });
@@ -68,7 +75,13 @@ const Caixa = (() => {
     function alterarQuantidade(produtoId, delta) {
         const item = _carrinho.find(i => i.produto.id === produtoId);
         if (!item) return;
-        item.quantidade = Math.max(1, item.quantidade + delta);
+        const estoque = _estoqueTotal(DB.buscarPorId(produtoId) || item.produto);
+        const novaQtd = Math.max(1, item.quantidade + delta);
+        if (novaQtd > estoque) {
+            _toast('Quantidade maior que o estoque disponível!', 'erro');
+            return;
+        }
+        item.quantidade = novaQtd;
         _renderCarrinho();
     }
 
@@ -168,11 +181,20 @@ const Caixa = (() => {
     function finalizarVenda() {
         if (_carrinho.length === 0) { _toast('Carrinho vazio!', 'erro'); return; }
 
-        const pago  = parseFloat(document.getElementById('caixa-pago')?.value) || 0;
+        const pagamento = document.getElementById('caixa-pagamento-hidden')?.value || 'dinheiro';
         const total = _totalCarrinho();
-        if (pago < total) { _toast('Valor pago insuficiente!', 'erro'); return; }
+        const pagoInformado = parseFloat(document.getElementById('caixa-pago')?.value) || 0;
+        const pago = pagamento === 'dinheiro' ? pagoInformado : total;
+        if (pagamento === 'dinheiro' && pago < total) { _toast('Valor pago insuficiente!', 'erro'); return; }
 
-        const pagamento = document.getElementById('caixa-pagamento')?.value || 'dinheiro';
+        for (const item of _carrinho) {
+            const produtoAtual = DB.buscarPorId(item.produto.id);
+            if (!produtoAtual || _estoqueTotal(produtoAtual) < item.quantidade) {
+                _toast(`Estoque insuficiente para ${item.produto.nome}.`, 'erro');
+                return;
+            }
+        }
+
         const troco = pago - total;
         const hora  = new Date().toLocaleString('pt-BR');
 

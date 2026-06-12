@@ -16,6 +16,33 @@
 #tela-dashboard::-webkit-scrollbar { width: 6px; }
 #tela-dashboard::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
 
+/* ---- ABAS INTERNAS ---- */
+.dash-tabs {
+    display: flex;
+    gap: 6px;
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 6px;
+    flex-shrink: 0;
+}
+
+.dash-tab {
+    flex: 1;
+    padding: 9px 14px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+    transition: var(--transition-fast);
+}
+
+.dash-tab:hover { color: var(--text-main); background: var(--bg-surface); }
+.dash-tab.ativo { background: var(--accent); color: #fff; }
+
 /* ---- CARDS DE RESUMO ---- */
 .dash-cards {
     display: grid;
@@ -297,3 +324,166 @@
 
 /* Card com atenção */
 .produto-card.card-atencao { border-color: #78350f; }
+
+/* ---- RELATORIO DE VALIDADES ---- */
+.dash-validade {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overflow-x: auto;
+}
+
+.dash-validade-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.dash-relatorio-sub {
+    color: var(--text-muted);
+    font-size: 12px;
+    margin-top: 6px;
+}
+
+.dash-filtros {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.4fr) repeat(6, minmax(130px, 1fr));
+    gap: 10px;
+    align-items: end;
+}
+
+.dash-filtro,
+.dash-filtro-input {
+    min-width: 0;
+}
+
+.dash-filtro {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.dash-filtro span {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.dash-filtro select,
+.dash-filtro-input {
+    width: 100%;
+    min-height: 36px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-main);
+    font-size: 12px;
+    outline: none;
+    padding: 8px 10px;
+}
+
+.dash-filtro select:focus,
+.dash-filtro-input:focus {
+    border-color: var(--accent);
+}
+
+.dash-relatorio-tabela {
+    min-width: 980px;
+}
+
+.dash-relatorio-tabela td:nth-child(4) {
+    font-weight: 600;
+}
+
+.dash-btn-link {
+    align-self: flex-end;
+    margin-top: auto;
+}
+
+@media (max-width: 1100px) {
+    .dash-filtros {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .dash-tabs,
+    .dash-validade-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .dash-filtros {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media print {
+    body {
+        background: #fff !important;
+        color: #111 !important;
+        height: auto !important;
+        padding: 0 !important;
+    }
+
+    body > *:not(#tela-dashboard) {
+        display: none !important;
+    }
+
+    #tela-dashboard {
+        display: block !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        color: #111 !important;
+    }
+
+    .dash-print-hide,
+    .dash-cards {
+        display: none !important;
+    }
+
+    .dash-print-area {
+        background: #fff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    .dash-validade-header {
+        border-bottom: 2px solid #111 !important;
+        margin-bottom: 12px !important;
+    }
+
+    .dash-secao-titulo,
+    .dash-relatorio-sub,
+    .dash-tabela th,
+    .dash-tabela td {
+        color: #111 !important;
+    }
+
+    .dash-tabela {
+        min-width: 0 !important;
+        font-size: 10px !important;
+    }
+
+    .dash-tabela th,
+    .dash-tabela td {
+        border-color: #d1d5db !important;
+        padding: 5px 6px !important;
+    }
+
+    .dash-tr-vencido td,
+    .dash-tr-atencao td {
+        background: #fff !important;
+    }
+}

@@ -5,6 +5,7 @@
 
 const DB = (() => {
     const KEY = 'atacadopro_produtos';
+    const KEY_VENDAS = 'atacadopro_vendas';
 
     const DEMO = [
         {
@@ -60,17 +61,30 @@ const DB = (() => {
         },
     ];
 
+    function _normalizarProduto(p) {
+        if (!p.codigoBarras) p.codigoBarras = '';
+        if (!p.validades) {
+            p.validades = p.validade
+                ? [{ id: 'v1', data: p.validade, quantidade: p.quantidade || 0 }]
+                : [];
+            delete p.validade;
+        }
+        return p;
+    }
+
     function carregar() {
         const raw = localStorage.getItem(KEY);
         if (!raw) { salvarTodos(DEMO); return JSON.parse(JSON.stringify(DEMO)); }
-        return JSON.parse(raw);
+        return JSON.parse(raw).map(_normalizarProduto);
     }
 
-    function salvarTodos(lista) { localStorage.setItem(KEY, JSON.stringify(lista)); }
+    function salvarTodos(lista) { localStorage.setItem(KEY, JSON.stringify(lista.map(_normalizarProduto))); }
     function listar() { return carregar(); }
     function buscarPorId(id) { return listar().find(p => p.id === id) || null; }
+    function estoqueTotal(produto) { return (produto.validades || []).reduce((s, v) => s + v.quantidade, 0); }
 
     function salvar(produto) {
+        produto = _normalizarProduto(produto);
         // Garante retrocompatibilidade: se tiver campo 'validade' antigo, migra
         if (!produto.validades) {
             produto.validades = produto.validade
