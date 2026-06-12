@@ -553,3 +553,52 @@
     .recibo-acoes { display: none; }
     .recibo-box   { box-shadow: none; max-height: none; border-radius: 0; }
 }
+
+/* ============================================================
+   RESPONSIVIDADE MOBILE — Caixa / PDV
+   ============================================================ */
+@media (max-width: 768px) {
+    #tela-caixa.visivel {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        gap: 0;
+    }
+
+    /* Painel direito (totais + pagamento) sobe para acima do carrinho em mobile
+       — usuário vê primeiro o carrinho depois o checkout */
+    .caixa-esquerda,
+    .caixa-direita {
+        min-height: 0;
+        flex-shrink: 0;
+    }
+
+    /* Busca e carrinho não crescem sem limite */
+    #caixa-carrinho {
+        max-height: 35vh;
+        overflow-y: auto;
+    }
+
+    /* Numpad de pagamento usa grid 3 colunas em mobile também */
+    .caixa-numpad,
+    .caixa-acoes {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    /* Botão de finalizar ocupa linha inteira */
+    .btn-finalizar,
+    .btn-cancelar-venda {
+        grid-column: 1 / -1;
+    }
+
+    /* Totais em fonte menor para caber */
+    .caixa-total-valor { font-size: 28px; }
+    .caixa-total-label { font-size: 12px; }
+}
+
+@media (max-width: 480px) {
+    .caixa-busca-input { font-size: 14px; padding: 10px 12px; }
+    .caixa-total-valor { font-size: 24px; }
+}

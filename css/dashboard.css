@@ -500,3 +500,72 @@
 /* Linhas da tabela com status */
 .dash-tr-vencido  { background: rgba(239,68,68,0.08); }
 .dash-tr-atencao  { background: rgba(245,158,11,0.08); }
+
+/* ============================================================
+   RESPONSIVIDADE MOBILE — Dashboard, Histórico, Estoque Baixo
+   ============================================================ */
+@media (max-width: 768px) {
+    .dash-cards {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+    .dash-card { padding: 12px; gap: 10px; }
+    .dash-card-icon { font-size: 24px; }
+    .dash-card-valor { font-size: 20px; }
+    .dash-card-label { font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+    .dash-cards { grid-template-columns: 1fr 1fr; }
+
+    /* Tabs do dashboard internos (Resumo / Validades / Vencidos) */
+    .dash-tabs {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .dash-tab {
+        flex: 1 0 auto;
+        font-size: 12px;
+        padding: 6px 10px;
+        white-space: nowrap;
+    }
+
+    /* Cabeçalho da seção de validades */
+    .dash-validade-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    /* Filtros empilham em coluna */
+    .dash-filtros {
+        grid-template-columns: 1fr !important;
+    }
+    .dash-filtro-input,
+    .dash-filtro select {
+        width: 100%;
+    }
+
+    /* Tabelas com scroll horizontal */
+    .dash-tabela {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    /* Seções do dashboard não crescem ilimitadas em mobile */
+    .dash-secao { max-height: none; }
+    .dash-secoes { grid-template-columns: 1fr; }
+}
+
+/* Histórico: linha de detalhe com scroll */
+@media (max-width: 640px) {
+    .hist-detalhe { padding: 8px !important; }
+    .hist-itens-table { font-size: 11px; }
+    .dash-relatorio-tabela {
+        display: block;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+}

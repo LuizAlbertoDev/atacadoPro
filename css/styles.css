@@ -537,3 +537,104 @@ svg#loja-svg {
 #tela-estoque-baixo .dash-validade {
     flex-grow: 1;
 }
+
+/* ============================================================
+   RESPONSIVIDADE MOBILE — AtacadoPro
+   Breakpoints: 640px (celular), 768px (tablet pequeno)
+   ============================================================ */
+
+/* ── Meta viewport já deve estar no HTML ── */
+
+/* ── Ajustes gerais de body ── */
+@media (max-width: 768px) {
+    body {
+        padding: 8px;
+        gap: 8px;
+        /* Permite rolar a página inteira em mobile */
+        height: auto;
+        min-height: 100dvh;
+    }
+}
+
+/* ── Header ── */
+@media (max-width: 768px) {
+    .header {
+        padding: 10px 14px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .header h1 {
+        font-size: 15px;
+    }
+    .header h1 span {
+        display: none; /* esconde subtítulo para economizar espaço */
+    }
+    .header-right {
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    /* Esconde o texto dos botões do header, mantém ícone */
+    .btn-search .btn-search-text { display: none; }
+    #btn-modo-funcionario .btn-func-text { display: none; }
+}
+
+/* ── Barra de abas ── */
+@media (max-width: 768px) {
+    .app-tabs {
+        gap: 2px;
+        padding: 4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .app-tabs::-webkit-scrollbar { display: none; }
+    .tab-btn {
+        flex: 0 0 auto;          /* não comprime — barra rola */
+        padding: 8px 12px;
+        font-size: 12px;
+        white-space: nowrap;
+    }
+}
+
+/* ── Mapa SVG ── */
+@media (max-width: 768px) {
+    .map-container {
+        /* Altura fixa confortável para visualização + toque */
+        height: 55vw;
+        min-height: 220px;
+        max-height: 340px;
+        flex-grow: 0;
+        align-items: flex-start;
+        overflow: auto;              /* permite pan com scroll */
+        -webkit-overflow-scrolling: touch;
+    }
+    svg#loja-svg {
+        /* SVG não encolhe — dá para arrastar */
+        width: auto;
+        height: 100%;
+        min-width: 600px;
+    }
+    .info-panel {
+        bottom: 8px;
+        right: 8px;
+        left: 8px;
+        max-width: none;
+        font-size: 13px;
+    }
+    .mapa-legenda {
+        bottom: 8px;
+        left: 8px;
+        font-size: 11px;
+    }
+}
+
+/* ── Telas secundárias em mobile ── */
+@media (max-width: 768px) {
+    #tela-dashboard,
+    #tela-historico,
+    #tela-estoque-baixo {
+        /* Em mobile a página inteira rola, não a div */
+        overflow-y: visible;
+        flex-grow: 0;
+    }
+}

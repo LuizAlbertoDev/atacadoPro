@@ -430,3 +430,92 @@
     font-size: 12px;
     margin-bottom: 4px;
 }
+
+/* ============================================================
+   RESPONSIVIDADE MOBILE — Produtos, Modal, Dashboard
+   ============================================================ */
+
+/* ── Toolbar de produtos ── */
+@media (max-width: 768px) {
+    .produtos-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+    }
+    .input-busca { width: 100%; }
+    .btn-primario, .btn-secundario { width: 100%; text-align: center; }
+}
+
+/* ── Grid de cards de produto ── */
+@media (max-width: 640px) {
+    #lista-produtos {
+        grid-template-columns: 1fr;
+        overflow-y: visible;   /* page scroll em mobile */
+    }
+}
+
+/* ── Card: card-top com badge de categoria pode quebrar linha ── */
+@media (max-width: 480px) {
+    .card-top {
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+    .card-acoes { margin-left: auto; }
+    .badge-categoria { font-size: 9px; padding: 2px 6px; }
+    .produto-nome { font-size: 14px; }
+    .destaque-preco { font-size: 16px; }
+    .info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+    }
+    .info-valor { text-align: left; }
+}
+
+/* ── Modal de cadastro ── */
+@media (max-width: 640px) {
+    .modal-overlay {
+        padding: 0;
+        align-items: flex-end;   /* sobe pelo rodapé (bottom sheet) */
+    }
+    .modal-box {
+        max-width: 100%;
+        max-height: 92dvh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        animation: modalInMobile 0.25s ease;
+    }
+    @keyframes modalInMobile {
+        from { transform: translateY(40px); opacity: 0; }
+        to   { transform: translateY(0);   opacity: 1; }
+    }
+    .modal-body { padding: 16px; gap: 16px; }
+    .modal-header { padding: 14px 16px; }
+    .modal-footer { padding: 12px 16px; }
+    .form-row { grid-template-columns: 1fr; }
+}
+
+/* ── Login overlay ── */
+@media (max-width: 640px) {
+    .login-cards {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        width: 100%;
+        padding: 0 16px;
+    }
+    .login-card {
+        width: 100%;
+        max-width: 340px;
+        padding: 20px 16px;
+        flex-direction: row;
+        text-align: left;
+        gap: 16px;
+    }
+    .login-card-icon { font-size: 30px; }
+    .login-logo h1 { font-size: 28px; }
+}
+
+/* ── Dashboard: hint de categoria no form ── */
+@media (max-width: 640px) {
+    .categoria-hint { font-size: 11px; flex-wrap: wrap; }
+}
