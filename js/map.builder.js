@@ -68,6 +68,31 @@ const MapBuilder = (() => {
     }
 
     /**
+     * Colore as gôndolas no mapa de acordo com a categoria dos produtos cadastrados.
+     * Chamado ao inicializar e ao salvar um produto.
+     */
+    function atualizarIndicadoresCategoria() {
+        // Remove classes de categoria anteriores
+        document.querySelectorAll('.shelf[class*="cat-"]').forEach(el => {
+            el.className = el.className.split(' ').filter(c => !c.startsWith('cat-')).join(' ');
+        });
+
+        // Mapeia gôndola → categoria
+        DB.listar().forEach(p => {
+            const gondola = (p.loja?.gondola || '').toUpperCase();
+            if (!gondola || !p.categoria) return;
+            const catCfg = LOJA_CONFIG.categorias[p.categoria];
+            if (!catCfg) return;
+            const el = document.getElementById(`gondola-${gondola}`);
+            if (!el) return;
+            // Só adiciona se ainda não tem uma classe de categoria (primeiro produto vence)
+            if (!el.className.includes('cat-')) {
+                el.classList.add(catCfg.cssClass);
+            }
+        });
+    }
+
+    /**
      * Limpa e reaplica as classes de status em todas as gôndolas.
      * Chamado ao ativar/desativar modo funcionário e ao salvar produtos.
      */
@@ -140,7 +165,9 @@ const MapBuilder = (() => {
     function init() {
         buildCorredores();
         buildCaixas();
+        // Pequeno delay para garantir que o DOM do SVG foi renderizado
+        setTimeout(() => atualizarIndicadoresCategoria(), 50);
     }
 
-    return { init, atualizarIndicadoresValidade };
+    return { init, atualizarIndicadoresValidade, atualizarIndicadoresCategoria };
 })();

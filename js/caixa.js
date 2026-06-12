@@ -218,7 +218,7 @@ const Caixa = (() => {
             DB.salvar(p);
         });
 
-        // Registra histórico
+        // Registra histórico (persistente)
         const venda = {
             id:         'VND' + Date.now(),
             hora,
@@ -235,6 +235,7 @@ const Caixa = (() => {
             troco,
         };
         _vendas.push(venda);
+        DB.salvarVenda(venda);
 
         // Exibe recibo
         _exibirRecibo(venda);
@@ -318,6 +319,7 @@ const Caixa = (() => {
     }
 
     function init() {
+        _vendas = DB.carregarVendas();
         _renderCarrinho();
     }
 

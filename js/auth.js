@@ -76,6 +76,12 @@ const Auth = (() => {
         const tabDash = document.querySelector('.tab-dashboard');
         if (tabDash) tabDash.style.display = isAdmin() ? '' : 'none';
 
+        // Abas histórico e estoque baixo só para admin
+        const tabHist = document.querySelector('.tab-historico');
+        if (tabHist) tabHist.style.display = isAdmin() ? '' : 'none';
+        const tabEstoque = document.querySelector('.tab-estoque');
+        if (tabEstoque) tabEstoque.style.display = isAdmin() ? '' : 'none';
+
         // Aba caixa só para caixa e admin
         const tabCaixa = document.querySelector('.tab-caixa');
         if (tabCaixa) tabCaixa.style.display = (isCaixa() || isAdmin()) ? '' : 'none';

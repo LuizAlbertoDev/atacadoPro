@@ -17,6 +17,8 @@
     --cor-padaria: #f59e0b;
     --cor-frios: #0ea5e9;
     --cor-horti: #10b981;
+    --cor-bebidas: #3b82f6;
+    --cor-adega: #a855f7;
 
     /* Cores dos Corredores */
     --cor-a: #22c55e;
@@ -36,3 +38,18 @@
     --transition-fast: 0.15s ease;
     --transition-base: 0.3s ease;
 }
+
+/* ── Gôndolas coloridas por categoria ───────────── */
+.shelf.cat-acougue  rect { fill: rgba(239,68,68,0.18);  stroke: #ef4444; }
+.shelf.cat-frios    rect { fill: rgba(14,165,233,0.18); stroke: #0ea5e9; }
+.shelf.cat-horti    rect { fill: rgba(16,185,129,0.18); stroke: #10b981; }
+.shelf.cat-padaria  rect { fill: rgba(245,158,11,0.18); stroke: #f59e0b; }
+.shelf.cat-bebidas  rect { fill: rgba(59,130,246,0.18); stroke: #3b82f6; }
+.shelf.cat-adega    rect { fill: rgba(168,85,247,0.18); stroke: #a855f7; }
+
+.shelf.cat-acougue  text.shelf-id { fill: #ef4444; }
+.shelf.cat-frios    text.shelf-id { fill: #0ea5e9; }
+.shelf.cat-horti    text.shelf-id { fill: #10b981; }
+.shelf.cat-padaria  text.shelf-id { fill: #f59e0b; }
+.shelf.cat-bebidas  text.shelf-id { fill: #3b82f6; }
+.shelf.cat-adega    text.shelf-id { fill: #a855f7; }

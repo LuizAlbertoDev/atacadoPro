@@ -10,8 +10,9 @@ const DB = (() => {
     const DEMO = [
         {
             id: 'PRD001', nome: 'Arroz Tipo 1 5kg', empresa: 'Tio João',
+            categoria: 'geral',
             quantidade: 240, valorCompra: 12.50, valorVenda: 18.90,
-            loja: { corredor: 'A', gondola: 'A3' },
+            loja: { corredor: 'E', gondola: 'E4' },
             deposito: { corredor: 'D1', armario: '2', prateleira: 'B' },
             validades: [
                 { id: 'v1', data: '2026-03-15', quantidade: 150 },
@@ -20,15 +21,17 @@ const DB = (() => {
         },
         {
             id: 'PRD002', nome: 'Feijão Carioca 1kg', empresa: 'Camil',
+            categoria: 'geral',
             quantidade: 180, valorCompra: 5.80, valorVenda: 8.49,
-            loja: { corredor: 'A', gondola: 'A5' },
+            loja: { corredor: 'E', gondola: 'E5' },
             deposito: { corredor: 'D1', armario: '3', prateleira: 'A' },
             validades: [{ id: 'v1', data: '2026-08-20', quantidade: 180 }]
         },
         {
             id: 'PRD003', nome: 'Óleo de Soja 900ml', empresa: 'Liza',
+            categoria: 'geral',
             quantidade: 96, valorCompra: 7.20, valorVenda: 10.99,
-            loja: { corredor: 'B', gondola: 'B2' },
+            loja: { corredor: 'F', gondola: 'F1' },
             deposito: { corredor: 'D2', armario: '1', prateleira: 'C' },
             validades: [
                 { id: 'v1', data: '2025-11-30', quantidade: 40 },
@@ -37,15 +40,17 @@ const DB = (() => {
         },
         {
             id: 'PRD004', nome: 'Macarrão Espaguete 500g', empresa: 'Barilla',
+            categoria: 'geral',
             quantidade: 312, valorCompra: 4.10, valorVenda: 6.49,
-            loja: { corredor: 'B', gondola: 'B7' },
+            loja: { corredor: 'F', gondola: 'F2' },
             deposito: { corredor: 'D2', armario: '4', prateleira: 'A' },
             validades: [{ id: 'v1', data: '2027-01-10', quantidade: 312 }]
         },
         {
             id: 'PRD005', nome: 'Leite Integral 1L', empresa: 'Italac',
+            categoria: 'frios',
             quantidade: 576, valorCompra: 3.40, valorVenda: 5.29,
-            loja: { corredor: 'C', gondola: 'C1' },
+            loja: { corredor: 'A', gondola: 'A6' },
             deposito: { corredor: 'D3', armario: '1', prateleira: 'A' },
             validades: [
                 { id: 'v1', data: '2025-09-05', quantidade: 200 },
@@ -54,8 +59,9 @@ const DB = (() => {
         },
         {
             id: 'PRD006', nome: 'Açúcar Refinado 2kg', empresa: 'União',
+            categoria: 'geral',
             quantidade: 200, valorCompra: 6.90, valorVenda: 10.49,
-            loja: { corredor: 'A', gondola: 'A8' },
+            loja: { corredor: 'E', gondola: 'E6' },
             deposito: { corredor: 'D1', armario: '5', prateleira: 'B' },
             validades: [{ id: 'v1', data: '2027-06-01', quantidade: 200 }]
         },
@@ -68,6 +74,12 @@ const DB = (() => {
                 ? [{ id: 'v1', data: p.validade, quantidade: p.quantidade || 0 }]
                 : [];
             delete p.validade;
+        }
+        // Infere categoria pela gôndola se não estiver salva
+        if (!p.categoria) {
+            p.categoria = (typeof LOJA_CONFIG !== 'undefined')
+                ? (LOJA_CONFIG.categoriaDaGondola(p.loja?.gondola) || 'geral')
+                : 'geral';
         }
         return p;
     }
@@ -210,5 +222,23 @@ const DB = (() => {
     }
     function _hoje() { return new Date().toISOString().slice(0,10); }
 
-    return { listar, buscarPorId, salvar, excluir, gerarId, adicionarValidade, excluirValidade, proximaValidade, statusValidade, exportarJSON, importarJSON, exportarExcel, importarExcel };
+    // ---- Vendas (persistência) ----
+    function salvarVenda(venda) {
+        const vendas = carregarVendas();
+        vendas.push(venda);
+        localStorage.setItem(KEY_VENDAS, JSON.stringify(vendas));
+    }
+
+    function carregarVendas() {
+        try {
+            const raw = localStorage.getItem(KEY_VENDAS);
+            return raw ? JSON.parse(raw) : [];
+        } catch { return []; }
+    }
+
+    function limparVendas() {
+        localStorage.removeItem(KEY_VENDAS);
+    }
+
+    return { listar, buscarPorId, salvar, excluir, gerarId, adicionarValidade, excluirValidade, proximaValidade, statusValidade, exportarJSON, importarJSON, exportarExcel, importarExcel, salvarVenda, carregarVendas, limparVendas };
 })();

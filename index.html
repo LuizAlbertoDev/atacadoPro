@@ -58,6 +58,8 @@
     <button class="tab-btn"                          onclick="App.mudarAba('produtos')">📦 Produtos</button>
     <button class="tab-btn tab-caixa"  style="display:none" onclick="App.mudarAba('caixa')">🏧 Caixa</button>
     <button class="tab-btn tab-dashboard so-admin" style="display:none" onclick="App.mudarAba('dashboard')">📊 Dashboard</button>
+    <button class="tab-btn tab-historico so-admin" style="display:none" onclick="App.mudarAba('historico')">🧾 Vendas</button>
+    <button class="tab-btn tab-estoque so-admin" style="display:none" onclick="App.mudarAba('estoque-baixo')">📉 Estoque Baixo</button>
 </nav>
 
 <!-- ===== MAPA ===== -->
@@ -203,6 +205,8 @@
 
 <!-- ===== DASHBOARD ===== -->
 <div id="tela-dashboard" style="display:none;"></div>
+<div id="tela-historico" style="display:none;"></div>
+<div id="tela-estoque-baixo" style="display:none;"></div>
 
 <!-- ===== MODAL CADASTRO ===== -->
 <div class="modal-overlay" id="modal-cadastro">
@@ -219,6 +223,12 @@
                     <div class="form-group"><label>Empresa</label><input id="campo-empresa" type="text" placeholder="Ex: Nestlé"/></div>
                 </div>
                 <div class="form-group"><label>Nome do Produto</label><input id="campo-nome" type="text" placeholder="Ex: Arroz Tipo 1 5kg"/></div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <select id="campo-categoria" onchange="Cadastro.atualizarGondolasPermitidas()">
+                        <option value="">— Selecione a categoria —</option>
+                    </select>
+                </div>
             </div>
             <div class="form-secao">
                 <div class="form-secao-titulo">Valores</div>
@@ -229,10 +239,14 @@
             </div>
             <div class="form-secao">
                 <div class="form-secao-titulo">📍 Endereço na Loja</div>
-                <div class="form-row">
-                    <div class="form-group"><label>Corredor</label><input id="campo-loja-corredor" type="text" placeholder="Ex: A, B..."/></div>
-                    <div class="form-group"><label>Gôndola</label><input id="campo-loja-gondola" type="text" placeholder="Ex: A3, B7..."/></div>
+                <div id="categoria-hint" class="categoria-hint" style="display:none"></div>
+                <div class="form-group">
+                    <label>Gôndola</label>
+                    <select id="campo-loja-gondola" onchange="Cadastro.sincronizarCorredorDaGondola()">
+                        <option value="">— Selecione a categoria primeiro —</option>
+                    </select>
                 </div>
+                <input id="campo-loja-corredor" type="text" style="display:none" />
             </div>
             <div class="form-secao">
                 <div class="form-secao-titulo">🏭 Endereço no Depósito</div>
@@ -286,7 +300,7 @@ const App = {
 
     mudarAba(aba) {
         this._abaAtual = aba;
-        ['mapa','produtos','caixa','dashboard'].forEach(a => {
+        ['mapa','produtos','caixa','dashboard','historico','estoque-baixo'].forEach(a => {
             const el = document.getElementById(`tela-${a}`);
             if (!el) return;
             if (a === 'caixa') {
@@ -296,17 +310,15 @@ const App = {
             }
         });
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('ativo'));
-        const abas = ['mapa','produtos','caixa','dashboard'];
-        const idx  = abas.indexOf(aba);
-        const btns = document.querySelectorAll('.tab-btn');
-        // Marca o botão da aba visível correspondente
-        btns.forEach(btn => {
+        document.querySelectorAll('.tab-btn').forEach(btn => {
             const onclick = btn.getAttribute('onclick') || '';
             if (onclick.includes(`'${aba}'`)) btn.classList.add('ativo');
         });
-        if (aba === 'produtos')  ListaProdutos.renderizar();
-        if (aba === 'dashboard') Dashboard.renderizar();
-        if (aba === 'caixa')     Caixa.init();
+        if (aba === 'produtos')      ListaProdutos.renderizar();
+        if (aba === 'dashboard')     Dashboard.renderizar();
+        if (aba === 'caixa')         Caixa.init();
+        if (aba === 'historico')     Historico.renderizar();
+        if (aba === 'estoque-baixo') EstoqueBaixo.renderizar();
     },
 
     selecionarPagamento(tipo, btn) {

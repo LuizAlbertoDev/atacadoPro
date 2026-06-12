@@ -497,3 +497,43 @@ svg#loja-svg {
     .route-path { animation: none; }
     * { transition: none !important; }
 }
+
+/* ---- TELAS SECUNDÁRIAS (dashboard, histórico, estoque baixo) ---- */
+/* Todas crescem para preencher o espaço disponível e rolam internamente */
+#tela-dashboard,
+#tela-historico,
+#tela-estoque-baixo {
+    flex-grow: 1;
+    min-height: 0;          /* essencial para flex-grow funcionar dentro de flex-column */
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#tela-dashboard::-webkit-scrollbar,
+#tela-historico::-webkit-scrollbar,
+#tela-estoque-baixo::-webkit-scrollbar { width: 6px; }
+#tela-dashboard::-webkit-scrollbar-thumb,
+#tela-historico::-webkit-scrollbar-thumb,
+#tela-estoque-baixo::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+}
+
+/* Resumo: seções expandem e têm scroll interno generoso */
+.dash-secao {
+    max-height: 420px;  /* aumentado para caber mais cards */
+}
+
+/* Tabela de validades: o wrapper cresce e dá scroll horizontal */
+.dash-validade {
+    flex-shrink: 0;         /* não comprime — a tela pai que rola */
+}
+
+/* Estoque baixo: wrapper do relatório */
+#tela-estoque-baixo .dash-validade {
+    flex-grow: 1;
+}

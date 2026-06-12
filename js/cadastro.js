@@ -21,16 +21,81 @@ const Cadastro = (() => {
         f('campo-empresa',      isEdicao ? produto.empresa     : '');
         f('campo-valor-compra', isEdicao ? produto.valorCompra : '');
         f('campo-valor-venda',  isEdicao ? produto.valorVenda  : '');
-        f('campo-loja-corredor',isEdicao ? produto.loja?.corredor : '');
-        f('campo-loja-gondola', isEdicao ? produto.loja?.gondola  : '');
         f('campo-dep-corredor', isEdicao ? produto.deposito?.corredor   : '');
         f('campo-dep-armario',  isEdicao ? produto.deposito?.armario    : '');
         f('campo-dep-prateleira',isEdicao? produto.deposito?.prateleira : '');
+
+        // Popular select de categorias
+        _popularSelectCategorias(isEdicao ? produto.categoria : '');
+        // Popular gôndolas da categoria e selecionar a atual
+        _popularGondolas(isEdicao ? produto.categoria : '', isEdicao ? produto.loja?.gondola : '');
 
         document.getElementById('form-produto').dataset.editandoId = isEdicao ? produto.id : '';
         _renderizarValidades(isEdicao ? produto.id : null, isEdicao ? (produto.validades||[]) : []);
 
         document.getElementById('modal-cadastro').classList.add('aberto');
+    }
+
+    function _popularSelectCategorias(categoriaAtual) {
+        const sel = document.getElementById('campo-categoria');
+        if (!sel) return;
+        sel.innerHTML = '<option value="">— Selecione a categoria —</option>';
+        Object.entries(LOJA_CONFIG.categorias).forEach(([key, cfg]) => {
+            const opt = document.createElement('option');
+            opt.value = key;
+            opt.textContent = `${cfg.emoji} ${cfg.label}`;
+            if (key === categoriaAtual) opt.selected = true;
+            sel.appendChild(opt);
+        });
+    }
+
+    function _popularGondolas(categoria, gondolaAtual) {
+        const sel = document.getElementById('campo-loja-gondola');
+        const hint = document.getElementById('categoria-hint');
+        if (!sel) return;
+
+        if (!categoria || !LOJA_CONFIG.categorias[categoria]) {
+            sel.innerHTML = '<option value="">— Selecione a categoria primeiro —</option>';
+            if (hint) hint.style.display = 'none';
+            return;
+        }
+
+        const cfg = LOJA_CONFIG.categorias[categoria];
+        sel.innerHTML = '<option value="">— Selecione a gôndola —</option>';
+        cfg.gondolas.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g;
+            opt.textContent = `Gôndola ${g}`;
+            if (g === gondolaAtual) opt.selected = true;
+            sel.appendChild(opt);
+        });
+
+        // Atualiza o corredor oculto
+        if (gondolaAtual) sincronizarCorredorDaGondola();
+
+        // Mostra dica visual
+        if (hint) {
+            hint.style.display = 'flex';
+            hint.style.background = cfg.cor + '22';
+            hint.style.borderColor = cfg.cor;
+            hint.style.color = cfg.cor;
+            hint.innerHTML = `<span>${cfg.emoji}</span> <strong>${cfg.label}</strong> · Gôndolas permitidas: ${cfg.gondolas.join(', ')}`;
+        }
+    }
+
+    function atualizarGondolasPermitidas() {
+        const categoria = document.getElementById('campo-categoria')?.value;
+        const gondolaAtual = document.getElementById('campo-loja-gondola')?.value;
+        _popularGondolas(categoria, gondolaAtual);
+    }
+
+    function sincronizarCorredorDaGondola() {
+        const gondola = document.getElementById('campo-loja-gondola')?.value;
+        const corrEl  = document.getElementById('campo-loja-corredor');
+        if (!corrEl) return;
+        if (gondola) {
+            corrEl.value = gondola.charAt(0);
+        }
     }
 
     function _renderizarValidades(produtoId, validades) {
@@ -109,13 +174,29 @@ const Cadastro = (() => {
 
         if (!g('campo-nome')) { alert('Informe o nome.'); return; }
 
+        const categoria = g('campo-categoria');
+        if (!categoria) { alert('Selecione a categoria do produto.'); return; }
+
+        const gondola = document.getElementById('campo-loja-gondola')?.value;
+        if (!gondola) { alert('Selecione a gôndola na loja.'); return; }
+
+        // Valida que a gôndola pertence à categoria
+        const catCfg = LOJA_CONFIG.categorias[categoria];
+        if (catCfg && !catCfg.gondolas.includes(gondola.toUpperCase())) {
+            alert(`❌ A gôndola "${gondola}" não pertence à categoria "${catCfg.label}".\n\nGôndolas permitidas: ${catCfg.gondolas.join(', ')}`);
+            return;
+        }
+
+        const corredor = gondola.charAt(0);
+
         const produto = {
             id:          idEditando || g('campo-id'),
             nome:        g('campo-nome'),
             empresa:     g('campo-empresa'),
+            categoria,
             valorCompra: parseFloat(g('campo-valor-compra')) || 0,
             valorVenda:  parseFloat(g('campo-valor-venda'))  || 0,
-            loja:     { corredor: g('campo-loja-corredor'), gondola:  g('campo-loja-gondola') },
+            loja:     { corredor, gondola },
             deposito: { corredor: g('campo-dep-corredor'),  armario:  g('campo-dep-armario'), prateleira: g('campo-dep-prateleira') },
             validades: idEditando ? (DB.buscarPorId(idEditando)?.validades || []) : _getValidadesTemp(),
         };
@@ -123,6 +204,7 @@ const Cadastro = (() => {
         DB.salvar(produto);
         fecharFormulario();
         ListaProdutos.renderizar();
+        MapBuilder.atualizarIndicadoresCategoria();
         if (App._abaAtual === 'dashboard') Dashboard.renderizar();
         _toast('Produto salvo!');
     }
@@ -141,7 +223,7 @@ const Cadastro = (() => {
         setTimeout(() => t.classList.remove('visivel'), 2500);
     }
 
-    return { abrirFormulario, fecharFormulario, salvarFormulario, excluirProduto, adicionarValidadeForm, excluirValidade };
+    return { abrirFormulario, fecharFormulario, salvarFormulario, excluirProduto, adicionarValidadeForm, excluirValidade, atualizarGondolasPermitidas, sincronizarCorredorDaGondola };
 })();
 
 
@@ -180,6 +262,12 @@ const ListaProdutos = (() => {
         const margem    = p.valorCompra > 0
             ? (((p.valorVenda - p.valorCompra) / p.valorCompra) * 100).toFixed(1) : 0;
 
+        // Badge de categoria
+        const catCfg = p.categoria ? LOJA_CONFIG.categorias[p.categoria] : null;
+        const catBadge = catCfg
+            ? `<span class="badge-categoria" style="background:${catCfg.cor}22;border-color:${catCfg.cor};color:${catCfg.cor}">${catCfg.emoji} ${catCfg.label}</span>`
+            : '';
+
         const validadesHTML = isFuncionario && validades.length > 0 ? `
             <div class="validades-lista">
                 ${validades.map(v => {
@@ -197,6 +285,7 @@ const ListaProdutos = (() => {
         <div class="produto-card ${status === 'vencido' ? 'card-vencido' : status === 'atencao' ? 'card-atencao' : ''}">
             <div class="card-top">
                 <span class="produto-id">${p.id}</span>
+                ${catBadge}
                 <span class="produto-empresa">${p.empresa}</span>
                 ${isFuncionario ? `
                 <div class="card-acoes">
@@ -572,4 +661,247 @@ const Dashboard = (() => {
     }
 
     return { renderizar, mudarAba, abrirValidades, atualizarFiltro, imprimirValidades, excluirLote };
+})();
+
+
+// ============================================================
+// HISTÓRICO DE VENDAS + RELATÓRIO DE CAIXA
+// ============================================================
+const Historico = (() => {
+    let _aba = 'historico';
+    let _filtroData = '';
+    let _filtroPag   = '';
+
+    function renderizar() {
+        const container = document.getElementById('tela-historico');
+        if (!container) return;
+
+        const vendas = DB.carregarVendas().slice().reverse(); // mais recentes primeiro
+
+        // ── Métricas de caixa (hoje) ──
+        const hoje = new Date().toLocaleDateString('pt-BR');
+        const vendasHoje = vendas.filter(v => {
+            const d = new Date(v.hora.split(', ')[0].split('/').reverse().join('-') + 'T00:00:00');
+            return isNaN(d) ? false : v.hora.startsWith(hoje);
+        });
+
+        const totalHoje    = vendasHoje.reduce((s, v) => s + v.total, 0);
+        const qtdVendas    = vendasHoje.length;
+        const ticketMedio  = qtdVendas > 0 ? totalHoje / qtdVendas : 0;
+        const porPagamento = { dinheiro: 0, cartao_debito: 0, cartao_credito: 0, pix: 0 };
+        vendasHoje.forEach(v => { porPagamento[v.pagamento] = (porPagamento[v.pagamento] || 0) + v.total; });
+
+        container.innerHTML = `
+        <div class="dash-tabs dash-print-hide">
+            <button class="dash-tab ${_aba === 'historico' ? 'ativo' : ''}" onclick="Historico.mudarAba('historico')">Histórico de Vendas</button>
+            <button class="dash-tab ${_aba === 'caixa' ? 'ativo' : ''}" onclick="Historico.mudarAba('caixa')">Relatório de Caixa</button>
+        </div>
+
+        ${_aba === 'caixa' ? _renderCaixa(vendasHoje, totalHoje, qtdVendas, ticketMedio, porPagamento) : _renderHistorico(vendas)}
+        `;
+    }
+
+    function _renderCaixa(vendasHoje, totalHoje, qtdVendas, ticketMedio, porPagamento) {
+        const pagLabel = { dinheiro: 'Dinheiro', cartao_debito: 'Cartão Débito', cartao_credito: 'Cartão Crédito', pix: 'PIX' };
+        return `
+        <div class="dash-cards">
+            <div class="dash-card">
+                <div class="dash-card-icon">💰</div>
+                <div class="dash-card-info">
+                    <div class="dash-card-valor">R$ ${totalHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                    <div class="dash-card-label">Total Vendido Hoje</div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-icon">🛒</div>
+                <div class="dash-card-info">
+                    <div class="dash-card-valor">${qtdVendas}</div>
+                    <div class="dash-card-label">Vendas Hoje</div>
+                </div>
+            </div>
+            <div class="dash-card">
+                <div class="dash-card-icon">📊</div>
+                <div class="dash-card-info">
+                    <div class="dash-card-valor">R$ ${ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                    <div class="dash-card-label">Ticket Médio</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dash-secoes">
+            <div class="dash-secao">
+                <div class="dash-secao-titulo">💳 Resumo por Forma de Pagamento</div>
+                <table class="dash-tabela">
+                    <thead><tr><th>Forma</th><th>Total</th><th>%</th></tr></thead>
+                    <tbody>
+                        ${Object.entries(porPagamento).map(([k, v]) => `
+                        <tr>
+                            <td>${pagLabel[k] || k}</td>
+                            <td>R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                            <td>${totalHoje > 0 ? ((v / totalHoje) * 100).toFixed(1) + '%' : '—'}</td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>`;
+    }
+
+    function _renderHistorico(vendas) {
+        // Filtros
+        let filtradas = vendas;
+        if (_filtroData) filtradas = filtradas.filter(v => v.hora.startsWith(_filtroData));
+        if (_filtroPag) filtradas = filtradas.filter(v => v.pagamento === _filtroPag);
+
+        const total = filtradas.reduce((s, v) => s + v.total, 0);
+        const pagLabel = { dinheiro: '💵 Dinheiro', cartao_debito: '💳 Débito', cartao_credito: '💳 Crédito', pix: '📲 PIX' };
+
+        return `
+        <div class="dash-validade">
+            <div class="dash-validade-header">
+                <div>
+                    <div class="dash-secao-titulo">Histórico de Vendas</div>
+                    <div class="dash-relatorio-sub">${filtradas.length} venda(s) · R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
+                </div>
+                <button class="btn-secundario" onclick="Historico.limpar()">🗑️ Limpar Histórico</button>
+            </div>
+
+            <div class="dash-filtros dash-print-hide">
+                <label class="dash-filtro">
+                    <span>Data</span>
+                    <input type="text" class="dash-filtro-input" placeholder="dd/mm/aaaa" value="${_filtroData}"
+                        oninput="Historico.filtrar('data', this.value)" style="width:130px" />
+                </label>
+                <label class="dash-filtro">
+                    <span>Pagamento</span>
+                    <select onchange="Historico.filtrar('pag', this.value)">
+                        <option value="">Todos</option>
+                        ${Object.entries(pagLabel).map(([k, v]) => `<option value="${k}" ${_filtroPag === k ? 'selected' : ''}>${v}</option>`).join('')}
+                    </select>
+                </label>
+            </div>
+
+            ${filtradas.length === 0
+                ? `<div class="dash-vazia">Nenhuma venda encontrada.</div>`
+                : `<table class="dash-tabela dash-relatorio-tabela">
+                    <thead><tr>
+                        <th>Hora</th><th>ID</th><th>Itens</th>
+                        <th>Pagamento</th><th>Total</th><th>Troco</th>
+                    </tr></thead>
+                    <tbody>
+                        ${filtradas.map(v => `
+                        <tr class="hist-row" onclick="Historico.expandir('${v.id}')" style="cursor:pointer" title="Clique para ver itens">
+                            <td>${v.hora}</td>
+                            <td><span class="produto-id">${v.id}</span></td>
+                            <td>${v.itens.length} item(s) · ${v.itens.reduce((s, i) => s + i.qtd, 0)} un.</td>
+                            <td>${pagLabel[v.pagamento] || v.pagamento}</td>
+                            <td><strong>R$ ${v.total.toFixed(2).replace('.', ',')}</strong></td>
+                            <td>${v.troco > 0 ? 'R$ ' + v.troco.toFixed(2).replace('.', ',') : '—'}</td>
+                        </tr>
+                        <tr id="detalhe-${v.id}" style="display:none">
+                            <td colspan="6" class="hist-detalhe">
+                                <table class="hist-itens-table">
+                                    <thead><tr><th>Produto</th><th>Qtd</th><th>Unit.</th><th>Desc</th><th>Subtotal</th></tr></thead>
+                                    <tbody>
+                                        ${v.itens.map(i => {
+                                            const desc = i.preco * (i.desconto / 100);
+                                            const sub  = (i.preco - desc) * i.qtd;
+                                            return `<tr>
+                                                <td>${i.nome}</td>
+                                                <td>${i.qtd}</td>
+                                                <td>R$ ${i.preco.toFixed(2).replace('.', ',')}</td>
+                                                <td>${i.desconto > 0 ? i.desconto + '%' : '—'}</td>
+                                                <td>R$ ${sub.toFixed(2).replace('.', ',')}</td>
+                                            </tr>`;
+                                        }).join('')}
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>`).join('')}
+                    </tbody>
+                </table>`
+            }
+        </div>`;
+    }
+
+    function mudarAba(aba) { _aba = aba; renderizar(); }
+    function filtrar(campo, valor) {
+        if (campo === 'data') _filtroData = valor;
+        if (campo === 'pag')  _filtroPag  = valor;
+        renderizar();
+    }
+    function expandir(id) {
+        const el = document.getElementById(`detalhe-${id}`);
+        if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+    }
+    function limpar() {
+        if (!confirm('Limpar todo o histórico de vendas? Essa ação não pode ser desfeita.')) return;
+        DB.limparVendas();
+        renderizar();
+    }
+
+    return { renderizar, mudarAba, filtrar, expandir, limpar };
+})();
+
+
+// ============================================================
+// ESTOQUE BAIXO
+// ============================================================
+const EstoqueBaixo = (() => {
+    let _limite = 20;
+
+    function renderizar() {
+        const container = document.getElementById('tela-estoque-baixo');
+        if (!container) return;
+
+        const todos = DB.listar();
+        const baixo = todos
+            .map(p => ({
+                p,
+                qtd: (p.validades || []).reduce((s, v) => s + v.quantidade, 0),
+            }))
+            .filter(r => r.qtd <= _limite)
+            .sort((a, b) => a.qtd - b.qtd);
+
+        container.innerHTML = `
+        <div class="dash-validade-header">
+            <div>
+                <div class="dash-secao-titulo">⚠️ Estoque Baixo</div>
+                <div class="dash-relatorio-sub">${baixo.length} produto(s) com ≤ ${_limite} unidades</div>
+            </div>
+            <label class="dash-filtro" style="flex-direction:row;align-items:center;gap:8px">
+                <span>Limite:</span>
+                <input type="number" min="1" max="999" value="${_limite}" style="width:70px;padding:4px 8px"
+                    onchange="EstoqueBaixo.setLimite(this.value)" />
+            </label>
+        </div>
+
+        ${baixo.length === 0
+            ? `<div class="dash-vazia">Nenhum produto abaixo do limite. ✅</div>`
+            : `<table class="dash-tabela dash-relatorio-tabela">
+                <thead><tr>
+                    <th>Código</th><th>Produto</th><th>Empresa</th>
+                    <th>Estoque</th><th>Loja</th><th>Depósito</th>
+                    <th class="dash-print-hide">Ação</th>
+                </tr></thead>
+                <tbody>
+                    ${baixo.map(({ p, qtd }) => `
+                    <tr class="${qtd === 0 ? 'dash-tr-vencido' : qtd <= 5 ? 'dash-tr-atencao' : ''}">
+                        <td><span class="produto-id">${p.id}</span></td>
+                        <td>${p.nome}</td>
+                        <td>${p.empresa || '—'}</td>
+                        <td><span class="${qtd === 0 ? 'badge-validade vencido' : qtd <= 5 ? 'badge-validade atencao' : ''}">${qtd} un.</span></td>
+                        <td>${p.loja?.corredor || '—'} · ${p.loja?.gondola || '—'}</td>
+                        <td>Corr. ${p.deposito?.corredor || '—'} · Arm. ${p.deposito?.armario || '—'} · Prat. ${p.deposito?.prateleira || '—'}</td>
+                        <td class="dash-print-hide">
+                            <button class="btn-acao editar" onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar/Repor">✏️</button>
+                        </td>
+                    </tr>`).join('')}
+                </tbody>
+            </table>`
+        }`;
+    }
+
+    function setLimite(val) { _limite = parseInt(val) || 20; renderizar(); }
+
+    return { renderizar, setLimite };
 })();
