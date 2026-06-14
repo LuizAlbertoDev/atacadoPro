@@ -131,8 +131,33 @@
 
 .card-top {
     display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* Linha superior: id + empresa + botões — nunca quebram juntos */
+.card-top-linha {
+    display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
+    width: 100%;
+    min-width: 0;
+}
+
+.card-top-linha .produto-empresa {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-acoes {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .produto-id {
@@ -143,17 +168,24 @@
     padding: 2px 8px;
     border-radius: 20px;
     letter-spacing: 0.5px;
+    flex-shrink: 0;     /* id nunca encolhe */
 }
 
 .produto-empresa {
     font-size: 11px;
     color: var(--text-muted);
     flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .card-acoes {
     display: flex;
     gap: 4px;
+    flex-shrink: 0;     /* botões nunca encolhem nem somem */
+    margin-left: auto;
 }
 
 .btn-acao {

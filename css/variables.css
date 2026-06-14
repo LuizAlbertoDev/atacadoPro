@@ -37,7 +37,12 @@
     /* Transições */
     --transition-fast: 0.15s ease;
     --transition-base: 0.3s ease;
+
+    /* Tipografia */
+    --font-main: 'Space Grotesk', system-ui, -apple-system, sans-serif;
 }
+
+
 
 /* ── Gôndolas coloridas por categoria ───────────── */
 .shelf.cat-acougue  rect { fill: rgba(239,68,68,0.18);  stroke: #ef4444; }

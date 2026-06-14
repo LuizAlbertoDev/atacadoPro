@@ -50,7 +50,7 @@ const DB = (() => {
             id: 'PRD005', nome: 'Leite Integral 1L', empresa: 'Italac',
             categoria: 'frios',
             quantidade: 576, valorCompra: 3.40, valorVenda: 5.29,
-            loja: { corredor: 'A', gondola: 'A6' },
+            loja: { corredor: 'FRIOS', gondola: 'FRIOS' },
             deposito: { corredor: 'D3', armario: '1', prateleira: 'A' },
             validades: [
                 { id: 'v1', data: '2025-09-05', quantidade: 200 },

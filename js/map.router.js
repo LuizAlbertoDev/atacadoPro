@@ -55,22 +55,29 @@ const MapRouter = (() => {
         el.pontoFim.setAttribute('cx', targetX); el.pontoFim.setAttribute('cy', targetY);
         el.pontoFim.style.display = 'block';
 
-        // ---- BUSCA DE PRODUTOS CORRIGIDA ----
+        const _norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
         let produtos = [];
         if (idGondola) {
-            // Clicou numa gôndola: busca exata pela gôndola
             produtos = DB.listar().filter(p => (p.loja?.gondola || '').toUpperCase() === idGondola.toUpperCase());
         } else {
-            // Clicou num setor fixo: busca pelo nome do setor no campo corredor
-            // Normaliza o título para comparação (ex: "Açougue" → "acougue")
-            const tituloNorm = titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-            produtos = DB.listar().filter(p => {
-                const corr = (p.loja?.corredor || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-                // Só bate se o corredor do produto for literalmente o nome do setor
-                // Ex: corredor = "Açougue" ou "acougue"
-                // NÃO bate se corredor = "A", "B", etc. (letras de corredor central)
-                return corr === tituloNorm;
+            // Setor fixo: compara pela categoria mapeada via LOJA_CONFIG
+            // Encontra qual categoria tem setorId correspondente ao setor clicado
+            const setorElId = `setor-${_norm(titulo).replace(/\s/g,'')}`;
+            let categoriaAlvo = null;
+            Object.entries(LOJA_CONFIG.categorias).forEach(([key, cfg]) => {
+                if (cfg.setorId === setorElId) categoriaAlvo = key;
             });
+
+            if (categoriaAlvo) {
+                produtos = DB.listar().filter(p => p.categoria === categoriaAlvo);
+            } else {
+                // fallback: compara corredor normalizado
+                const tituloNorm = _norm(titulo);
+                produtos = DB.listar().filter(p =>
+                    _norm(p.loja?.gondola  || '') === tituloNorm ||
+                    _norm(p.loja?.corredor || '') === tituloNorm
+                );
+            }
         }
 
         _renderizarPainel(titulo, descricao, produtos, idGondola);

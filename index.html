@@ -56,6 +56,7 @@
 <nav class="app-tabs">
     <button class="tab-btn ativo"                    onclick="App.mudarAba('mapa')">🗺️ Mapa</button>
     <button class="tab-btn"                          onclick="App.mudarAba('produtos')">📦 Produtos</button>
+    <button class="tab-btn tab-deposito so-funcionario" style="display:none" onclick="App.mudarAba('deposito')">🏭 Depósito</button>
     <button class="tab-btn tab-caixa"  style="display:none" onclick="App.mudarAba('caixa')">🏧 Caixa</button>
     <button class="tab-btn tab-dashboard so-admin" style="display:none" onclick="App.mudarAba('dashboard')">📊 Dashboard</button>
     <button class="tab-btn tab-historico so-admin" style="display:none" onclick="App.mudarAba('historico')">🧾 Vendas</button>
@@ -66,42 +67,49 @@
 <div id="tela-mapa" class="map-container">
     <svg id="loja-svg" viewBox="0 0 1200 850" role="img" aria-label="Mapa interativo">
         <rect class="floor" x="10" y="10" width="1180" height="830" rx="8" />
-        <g class="section" id="setor-acougue"    onclick="MapRouter.tracarRota('Açougue','Carnes Frescas',80,80)">
+        <g class="section" id="setor-acougue"    onclick="MapRouter.tracarRota('Açougue','Carnes Frescas',80,80)" data-categoria="acougue">
             <rect x="20" y="20" width="120" height="120" rx="6" style="stroke:var(--cor-acougue)"/>
             <text x="80" y="70"  class="section-text" style="fill:var(--cor-acougue)">AÇOUGUE</text>
             <text x="80" y="95"  class="sub-text">CARNES</text>
+            <text x="80" y="115" class="sub-text" style="fill:var(--cor-acougue);font-size:9px">🥩 A1–A5</text>
         </g>
-        <g class="section" id="setor-frios"      onclick="MapRouter.tracarRota('Frios','Laticínios e Embutidos',80,240)">
+        <g class="section" id="setor-frios"      onclick="MapRouter.tracarRota('Frios','Laticínios e Embutidos',80,240)" data-categoria="frios">
             <rect x="20" y="150" width="120" height="180" rx="6" style="stroke:var(--cor-frios)"/>
             <text x="80" y="215" class="section-text" style="fill:var(--cor-frios)">FRIOS</text>
-            <text x="80" y="240" class="sub-text">LATICÍNIOS</text>
-            <text x="80" y="258" class="sub-text">QUEIJOS</text>
+            <text x="80" y="238" class="sub-text">LATICÍNIOS</text>
+            <text x="80" y="256" class="sub-text">QUEIJOS</text>
+            <text x="80" y="274" class="sub-text" style="fill:var(--cor-frios);font-size:9px">🧀 A6–B3</text>
         </g>
-        <g class="section" id="setor-hortifruti" onclick="MapRouter.tracarRota('Hortifruti','Frutas e Verduras',80,430)">
+        <g class="section" id="setor-hortifruti" onclick="MapRouter.tracarRota('Hortifruti','Frutas e Verduras',80,430)" data-categoria="horti">
             <rect x="20" y="340" width="120" height="180" rx="6" style="stroke:var(--cor-horti)"/>
             <text x="80" y="405" class="section-text" style="fill:var(--cor-horti)">HORTIFRUTI</text>
-            <text x="80" y="430" class="sub-text">FRUTAS</text>
-            <text x="80" y="448" class="sub-text">VERDURAS</text>
+            <text x="80" y="428" class="sub-text">FRUTAS</text>
+            <text x="80" y="446" class="sub-text">VERDURAS</text>
+            <text x="80" y="464" class="sub-text" style="fill:var(--cor-horti);font-size:9px">🥦 B4–B10</text>
         </g>
-        <g class="section" id="setor-padaria"    onclick="MapRouter.tracarRota('Padaria','Pães e Bolos',80,620)">
+        <g class="section" id="setor-padaria"    onclick="MapRouter.tracarRota('Padaria','Pães e Bolos',80,620)" data-categoria="padaria">
             <rect x="20" y="530" width="120" height="140" rx="6" style="stroke:var(--cor-padaria)"/>
             <text x="80" y="585" class="section-text" style="fill:var(--cor-padaria)">PADARIA</text>
-            <text x="80" y="610" class="sub-text">PÃES QUENTES</text>
+            <text x="80" y="608" class="sub-text">PÃES QUENTES</text>
+            <text x="80" y="626" class="sub-text" style="fill:var(--cor-padaria);font-size:9px">🍞 C1–C5</text>
         </g>
-        <g class="section" id="setor-bebidas"    onclick="MapRouter.tracarRota('Bebidas','Águas, Sucos e Refri',1120,160)">
+        <g class="section" id="setor-bebidas"    onclick="MapRouter.tracarRota('Bebidas','Águas, Sucos e Refri',1120,160)" data-categoria="bebidas">
             <rect x="1060" y="20" width="120" height="280" rx="6" style="stroke:var(--cor-b)"/>
-            <text x="1120" y="140" class="section-text" style="fill:var(--cor-b)">BEBIDAS</text>
-            <text x="1120" y="168" class="sub-text">ÁGUAS & SUCOS</text>
+            <text x="1120" y="130" class="section-text" style="fill:var(--cor-b)">BEBIDAS</text>
+            <text x="1120" y="155" class="sub-text">ÁGUAS & SUCOS</text>
+            <text x="1120" y="175" class="sub-text" style="fill:var(--cor-b);font-size:9px">🥤 C6–D5</text>
         </g>
-        <g class="section" id="setor-adega"      onclick="MapRouter.tracarRota('Adega','Vinhos e Destilados',1120,380)">
+        <g class="section" id="setor-adega"      onclick="MapRouter.tracarRota('Adega','Vinhos e Destilados',1120,380)" data-categoria="adega">
             <rect x="1060" y="310" width="120" height="140" rx="6" style="stroke:var(--cor-d)"/>
-            <text x="1120" y="375" class="section-text" style="fill:var(--cor-d)">ADEGA</text>
-            <text x="1120" y="400" class="sub-text">VINHOS</text>
+            <text x="1120" y="368" class="section-text" style="fill:var(--cor-d)">ADEGA</text>
+            <text x="1120" y="390" class="sub-text">VINHOS</text>
+            <text x="1120" y="410" class="sub-text" style="fill:var(--cor-d);font-size:9px">🍷 D6–E3</text>
         </g>
-        <g class="section" id="setor-deposito"   onclick="MapRouter.tracarRota('Depósito','Acesso Restrito',1120,520)">
+        <g class="section" id="setor-deposito"   onclick="App.mudarAba('deposito')" style="cursor:pointer" title="Ver mapa do depósito">
             <rect x="1060" y="460" width="120" height="120" rx="6"/>
-            <text x="1120" y="515" class="section-text">DEPÓSITO</text>
-            <text x="1120" y="540" class="sub-text">RESTRITO</text>
+            <text x="1120" y="510" class="section-text">DEPÓSITO</text>
+            <text x="1120" y="535" class="sub-text">RESTRITO</text>
+            <text x="1120" y="558" class="sub-text" style="fill:var(--accent);font-size:9px">▶ Ver mapa</text>
         </g>
         <g class="section" id="setor-sanitarios" onclick="MapRouter.tracarRota('Sanitários','WC Clientes',1120,640)">
             <rect x="1060" y="590" width="120" height="80" rx="6"/>
@@ -203,6 +211,196 @@
     </div>
 </div>
 
+<!-- ===== MAPA DEPOSITO ===== -->
+<div id="tela-deposito" class="map-container" style="display:none">
+    <svg id="deposito-svg" viewBox="0 0 1200 760" role="img" aria-label="Mapa do Depósito">
+        <rect class="floor" x="8" y="8" width="1084" height="684" rx="8"/>
+        <!-- DOCA -->
+        <g class="section" id="setor-doca">
+            <rect x="16" y="14" width="500" height="80" rx="5"
+                style="stroke:#2563eb"/>
+
+            <text x="266" y="50"
+                class="section-text"
+                style="fill:#2563eb">
+                DOCA
+            </text>
+
+            <text x="266" y="68"
+                class="sub-text">
+                LOCAL ESTACIONAR CAMINHÃO
+            </text>
+        </g>
+
+        <!-- ESPERA MOTORISTAS -->
+        <g class="section" id="setor-espera">
+            <rect x="16" y="106" width="140" height="68" rx="5" style="stroke:#f59e0b"/>
+            <text x="86" y="137" class="section-text" style="fill:#f59e0b">ESPERA</text>
+            <text x="86" y="155" class="sub-text">MOTORISTAS</text>
+        </g>
+
+        <!-- ESCRITÓRIO -->
+        <g class="section" id="setor-escritorio">
+            <rect x="168" y="106" width="180" height="68" rx="5" style="stroke:#64748b"/>
+            <text x="258" y="137" class="section-text" style="fill:#64748b">ESCRITÓRIO</text>
+            <text x="258" y="155" class="sub-text">ADMINISTRAÇÃO</text>
+        </g>
+
+        <!-- WC -->
+        <g class="section" id="setor-wc-dep">
+            <rect x="360" y="106" width="140" height="68" rx="5" style="stroke:#14b8a6"/>
+            <text x="430" y="137" class="section-text" style="fill:#14b8a6">WC</text>
+            <text x="430" y="155" class="sub-text">BANHEIRO</text>
+        </g>
+
+        <!-- CONFERÊNCIA -->
+        <g class="section" id="setor-conferencia">
+            <rect x="530" y="14" width="260" height="80" rx="5"
+                style="stroke:#10b981"/>
+
+            <text x="660" y="50"
+                class="section-text"
+                style="fill:#10b981">
+                CONFERÊNCIA
+            </text>
+
+            <text x="660" y="68"
+                class="sub-text">
+                TRIAGEM
+            </text>
+        </g>
+
+        <!-- CÂMARA FRIA -->
+        <g class="section" id="setor-camara-fria">
+            <rect x="916" y="14" width="176" height="110" rx="5" style="stroke:#06b6d4"/>
+            <text x="1004" y="62" class="section-text" style="fill:#06b6d4">CÂMARA</text>
+            <text x="1004" y="80" class="sub-text">FRIA</text>
+        </g>
+
+        <!-- PALETEIRAS -->
+        <g class="section" id="setor-paleteiras">
+            <rect x="916" y="136" width="176" height="58" rx="5" style="stroke:#8b5cf6"/>
+            <text x="1004" y="169" class="section-text" style="fill:#8b5cf6">PALETEIRAS</text>
+        </g>
+
+        <!-- DESCARTE -->
+        <g class="section" id="setor-descarte">
+            <rect x="916" y="206" width="176" height="58" rx="5" style="stroke:#ef4444"/>
+            <text x="1004" y="232" class="section-text" style="fill:#ef4444">DESCARTE</text>
+            <text x="1004" y="250" class="sub-text">AVARIAS</text>
+        </g>
+        <!-- Corredores de circulação -->
+        <rect x="16" y="190" width="888" height="26" fill="var(--bg-body)" opacity="0.8"/>
+        <text x="22" y="208" style="fill:var(--text-muted);font-size:10px;font-weight:700">RUA A</text>
+        <rect x="16" y="360" width="888" height="26" fill="var(--bg-body)" opacity="0.8"/>
+        <text x="22" y="378" style="fill:var(--text-muted);font-size:10px;font-weight:700">RUA B</text>
+        <rect x="16" y="530" width="888" height="26"fill="var(--bg-body)" opacity="0.8"/>
+        <text x="22" y="548"style="fill:var(--text-muted);font-size:10px;font-weight:700">RUA C</text>
+        
+        
+        <!-- Posições Rua A -->
+        <g id="posicoes-deposito">
+            <rect x="20" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P01"/>
+            <text x="62" y="254" class="dep-id">P01</text>
+            <rect x="116" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P02"/>
+            <text x="158" y="254" class="dep-id">P02</text>
+            <rect x="212" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P03"/>
+            <text x="254" y="254" class="dep-id">P03</text>
+            <rect x="308" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P04"/>
+            <text x="350" y="254" class="dep-id">P04</text>
+            <rect x="404" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P05"/>
+            <text x="446" y="254" class="dep-id">P05</text>
+            <rect x="500" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P06"/>
+            <text x="542" y="254" class="dep-id">P06</text>
+            <rect x="596" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P07"/>
+            <text x="638" y="254" class="dep-id">P07</text>
+            <rect x="692" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P08"/>
+            <text x="734" y="254" class="dep-id">P08</text>
+            <rect x="788" y="225" width="84" height="48" rx="4" class="posicao-dep" id="dep-P09"/>
+            <text x="830" y="254" class="dep-id">P09</text>
+            <!-- Posições Rua B -->
+            <rect x="20" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P10"/>
+            <text x="62" y="424" class="dep-id">P10</text>
+            <rect x="116" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P11"/>
+            <text x="158" y="424" class="dep-id">P11</text>
+            <rect x="212" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P12"/>
+            <text x="254" y="424" class="dep-id">P12</text>
+            <rect x="308" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P13"/>
+            <text x="350" y="424" class="dep-id">P13</text>
+            <rect x="404" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P14"/>
+            <text x="446" y="424" class="dep-id">P14</text>
+            <rect x="500" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P15"/>
+            <text x="542" y="424" class="dep-id">P15</text>
+            <rect x="596" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P16"/>
+            <text x="638" y="424" class="dep-id">P16</text>
+            <rect x="692" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P17"/>
+            <text x="734" y="424" class="dep-id">P17</text>
+            <rect x="788" y="395" width="84" height="48" rx="4" class="posicao-dep" id="dep-P18"/>
+            <text x="830" y="424" class="dep-id">P18</text>
+
+            <!-- Posições Rua C -->
+            <rect x="20" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P19"/>
+            <text x="62" y="594" class="dep-id">P19</text>
+
+            <rect x="116" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P20"/>
+            <text x="158" y="594" class="dep-id">P20</text>
+
+            <rect x="212" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P21"/>
+            <text x="254" y="594" class="dep-id">P21</text>
+
+            <rect x="308" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P22"/>
+            <text x="350" y="594" class="dep-id">P22</text>
+
+            <rect x="404" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P23"/>
+            <text x="446" y="594" class="dep-id">P23</text>
+
+            <rect x="500" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P24"/>
+            <text x="542" y="594" class="dep-id">P24</text>
+
+            <rect x="596" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P25"/>
+            <text x="638" y="594" class="dep-id">P25</text>
+
+            <rect x="692" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P26"/>
+            <text x="734" y="594" class="dep-id">P26</text>
+
+            <rect x="788" y="565" width="84" height="48" rx="4" class="posicao-dep" id="dep-P27"/>
+            <text x="830" y="594" class="dep-id">P27</text>
+        </g>
+        <g id="entrada-deposito">
+            <rect x="430" y="650" width="200" height="50" rx="4"
+                fill="var(--bg-surface)"
+                stroke="#10b981"
+                stroke-width="2"/>
+
+            <text x="530" y="673"
+                class="section-text"
+                style="fill:#10b981">
+                ENTRADA
+            </text>
+
+            <text x="530" y="690"
+                class="sub-text"
+                style="fill:#10b981">
+                FUNCIONÁRIOS ▲
+            </text>
+        </g>
+        <!-- Tooltip de posição -->
+        <g id="dep-tooltip" style="display:none">
+            <rect id="dep-tooltip-bg" rx="4" fill="var(--bg-panel)" stroke="var(--accent)" stroke-width="1"/>
+            <text id="dep-tooltip-text" class="sub-text" style="fill:var(--text-main);font-size:11px"></text>
+        </g>
+    </svg>
+    <!-- Painel info depósito -->
+    <aside class="info-panel" id="info-panel-dep" aria-live="polite" style="display:none">
+        <button class="close-btn" onclick="document.getElementById('info-panel-dep').style.display='none'">✖</button>
+        <span class="info-label">Posição no Depósito</span>
+        <h3 id="dep-info-titulo">--</h3>
+        <p  id="dep-info-produtos">--</p>
+    </aside>
+    <!-- Botão voltar ao mapa da loja -->
+    <button class="dep-btn-voltar" onclick="App.mudarAba('mapa')" title="Voltar ao mapa da loja">🗺️ Mapa da Loja</button>
+</div>
+
 <!-- ===== DASHBOARD ===== -->
 <div id="tela-dashboard" style="display:none;"></div>
 <div id="tela-historico" style="display:none;"></div>
@@ -300,7 +498,7 @@ const App = {
 
     mudarAba(aba) {
         this._abaAtual = aba;
-        ['mapa','produtos','caixa','dashboard','historico','estoque-baixo'].forEach(a => {
+        ['mapa','deposito','produtos','caixa','dashboard','historico','estoque-baixo'].forEach(a => {
             const el = document.getElementById(`tela-${a}`);
             if (!el) return;
             if (a === 'caixa') {
@@ -319,6 +517,7 @@ const App = {
         if (aba === 'caixa')         Caixa.init();
         if (aba === 'historico')     Historico.renderizar();
         if (aba === 'estoque-baixo') EstoqueBaixo.renderizar();
+        if (aba === 'deposito')      MapDeposito.colorirPosicoes();
     },
 
     selecionarPagamento(tipo, btn) {
@@ -349,6 +548,12 @@ const App = {
             const yPos   = num <= metade ? 80+(num-1)*52 : 410+(num-metade-1)*52;
             MapRouter.tracarRota(`Corredor ${corredor}`, nomeProduto, config.x+45, yPos+20, gondola);
         }, 50);
+    },
+
+    // Abre formulário de novo produto já com a categoria do setor pré-selecionada
+    abrirNoProdutoCategoria(categoria) {
+        if (!Auth.isFuncionario()) return;
+        Cadastro.abrirFormulario(null, categoria);
     },
 
     filtrarProdutos(gondola, titulo) {
@@ -390,7 +595,174 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('login-overlay').classList.remove('oculto');
 });
 
-// Quando o perfil muda
+// ── Mapa do Depósito ────────────────────────────────────────
+const MapDeposito = (() => {
+    const _posMap = {
+        D1:'P01',
+        D2:'P02',
+        D3:'P03',
+        D4:'P04',
+        D5:'P05',
+        D6:'P06',
+        D7:'P07',
+        D8:'P08',
+        D9:'P09',
+        D10:'P10',
+        D11:'P11',
+        D12:'P12',
+        D13:'P13',
+        D14:'P14',
+        D15:'P15',
+        D16:'P16',
+        D17:'P17',
+        D18:'P18',
+        D19:'P19',
+        D20:'P20',
+        D21:'P21',
+        D22:'P22',
+        D23:'P23',
+        D24:'P24',
+        D25:'P25',
+        D26:'P26',
+        D27:'P27',
+        D28:'P28',
+        D29:'P29',
+        D30:'P30',
+        D31:'P31',
+        D32:'P32',
+        D33:'P33',
+        D34:'P34',
+        D35:'P35',
+        D36:'P36',
+        D37:'P37',
+        D38:'P38',
+        D39:'P39',
+        D40:'P40',
+        D41:'P41',
+        D42:'P42',
+        D43:'P43',
+        D44:'P44',
+        D45:'P45',
+        D46:'P46',
+        D47:'P47',
+        D48:'P48'
+        };
+
+    function _agrupar() {
+        const porPos = {};
+        DB.listar().forEach(p => {
+            const corr = (p.deposito?.corredor || '').toUpperCase().trim();
+            if (!corr) return;
+            const posId = _posMap[corr];
+            if (!posId) return;
+            if (!porPos[posId]) porPos[posId] = [];
+            porPos[posId].push(p);
+        });
+        return porPos;
+    }
+
+    function colorirPosicoes() {
+        document.querySelectorAll('.posicao-dep').forEach(el => {
+            el.style.fill        = 'var(--bg-surface)';
+            el.style.stroke      = 'var(--border-color)';
+            el.style.strokeWidth = '1';
+            el.style.cursor      = 'pointer';
+            el.onclick           = null;
+        });
+        document.querySelectorAll('#deposito-svg text.dep-id').forEach(el => {
+            el.style.fill   = 'var(--text-muted)';
+            el.style.cursor = 'pointer';
+            el.onclick      = null;
+        });
+
+        const porPos = _agrupar();
+
+        Object.entries(porPos).forEach(([posId, produtos]) => {
+            const rect = document.getElementById('dep-' + posId);
+            if (!rect) return;
+            const cat = LOJA_CONFIG.categorias[produtos[0]?.categoria];
+            const cor = cat ? cat.cor : 'var(--accent)';
+
+            rect.style.fill        = cor + '33';
+            rect.style.stroke      = cor;
+            rect.style.strokeWidth = '2';
+            rect.onclick = () => _mostrarInfo(posId, produtos);
+
+            document.querySelectorAll('#deposito-svg text.dep-id').forEach(txt => {
+                if (txt.textContent.trim() === posId) {
+                    txt.style.fill   = cor;
+                    txt.style.cursor = 'pointer';
+                    txt.onclick = () => _mostrarInfo(posId, produtos);
+                }
+            });
+        });
+
+        document.querySelectorAll('.posicao-dep').forEach(el => {
+            if (!el.onclick) {
+                const posId = el.id.replace('dep-', '');
+                el.onclick = () => _mostrarInfo(posId, []);
+            }
+        });
+        document.querySelectorAll('#deposito-svg text.dep-id').forEach(txt => {
+            if (!txt.onclick) {
+                const posId = txt.textContent.trim();
+                txt.onclick = () => _mostrarInfo(posId, []);
+            }
+        });
+    }
+
+    function _mostrarInfo(posId, produtos) {
+        const painel = document.getElementById('info-panel-dep');
+        const titulo = document.getElementById('dep-info-titulo');
+        const lista  = document.getElementById('dep-info-produtos');
+        if (!painel) return;
+
+        titulo.textContent = 'Posição ' + posId;
+
+        if (produtos.length === 0) {
+            lista.innerHTML = '<em style="color:var(--text-muted)">Posição livre</em>';
+        } else {
+            const statusCor   = { vencido:'#ef4444', atencao:'#f59e0b', ok:'var(--text-muted)' };
+            const statusLabel = { vencido:'🔴 Vencido', atencao:'🟡 Vence em breve', ok:'🟢 OK' };
+
+            lista.innerHTML = produtos.map(p => {
+                const qtd     = (p.validades||[]).reduce((s,v) => s+v.quantidade, 0);
+                const proxVal = DB.proximaValidade(p);
+                const status  = proxVal ? DB.statusValidade(proxVal.data) : 'ok';
+                const cat     = LOJA_CONFIG.categorias[p.categoria];
+                const cor     = cat?.cor || 'var(--accent)';
+                const nomeSafe = p.nome.replace(/'/g, "\'");
+
+                return `<div style="margin:8px 0;padding:10px 12px;background:var(--bg-surface);border-radius:8px;border-left:3px solid ${cor}">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                        <div>
+                            <div style="font-weight:700;font-size:13px;margin-bottom:2px">${p.nome}</div>
+                            <div style="font-size:11px;color:var(--text-muted)">${cat ? cat.emoji+' '+cat.label : ''} &middot; ${p.id} &middot; ${p.empresa||'—'}</div>
+                        </div>
+                        <span style="font-size:11px;white-space:nowrap;color:${statusCor[status]}">${statusLabel[status]}</span>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;flex-wrap:wrap;color:var(--text-muted)">
+                        <span>📦 <strong style="color:var(--text-main)">${qtd} un.</strong></span>
+                        <span>🏷️ Arm. ${p.deposito?.armario||'—'} · Prat. ${p.deposito?.prateleira||'—'}</span>
+                        <span>🏪 Loja: <strong style="color:var(--text-main)">${p.loja?.gondola||'—'}</strong></span>
+                        ${proxVal ? `<span style="color:${statusCor[status]}">📅 ${proxVal.data}</span>` : ''}
+                    </div>
+                    <button onclick="App.irParaMapa('${p.loja?.gondola||''}','${nomeSafe}')"
+                        style="margin-top:8px;width:100%;padding:6px;background:transparent;border:1px solid var(--border-color);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer"
+                        onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text-main)'"
+                        onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-muted)'">
+                        📍 Ver no Mapa da Loja
+                    </button>
+                </div>`;
+            }).join('');
+        }
+        painel.style.display = '';
+    }
+
+    return { colorirPosicoes };
+})();
+
+
 document.addEventListener('perfilAlterado', (e) => {
     const perfil = e.detail.perfil;
 
@@ -400,6 +772,11 @@ document.addEventListener('perfilAlterado', (e) => {
     // Atualiza visibilidade dos elementos .so-admin
     document.querySelectorAll('.so-admin').forEach(el => {
         el.style.display = perfil === 'admin' ? '' : 'none';
+    });
+
+    // Aba depósito para funcionários (conferente, caixa, admin)
+    document.querySelectorAll('.tab-deposito').forEach(el => {
+        el.style.display = (perfil !== 'cliente') ? '' : 'none';
     });
 
     // Atualiza indicadores do mapa

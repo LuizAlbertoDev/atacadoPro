@@ -71,23 +71,67 @@ const MapBuilder = (() => {
      * Colore as gôndolas no mapa de acordo com a categoria dos produtos cadastrados.
      * Chamado ao inicializar e ao salvar um produto.
      */
+    // Mapa de valor da gondola → id do elemento SVG do setor fixo
+    const _setorFixoMap = {
+        'AÇOUGUE':   'setor-acougue',
+        'FRIOS':     'setor-frios',
+        'HORTIFRUTI':'setor-hortifruti',
+        'PADARIA':   'setor-padaria',
+        'BEBIDAS':   'setor-bebidas',
+        'ADEGA':     'setor-adega',
+    };
+
+    function _elPorGondola(gondola) {
+        if (!gondola) return null;
+        const g = gondola.toUpperCase().trim();
+        // Setor fixo (ex: AÇOUGUE) → busca pelo id do setor no SVG
+        if (_setorFixoMap[g]) return document.getElementById(_setorFixoMap[g]);
+        // Gôndola de corredor (ex: A3) → busca pelo id gerado dinamicamente
+        return document.getElementById(`gondola-${g}`);
+    }
+
+    const _getClass = el => el.getAttribute('class') || '';
+    const _setClass = (el, cls) => el.setAttribute('class', cls);
+
     function atualizarIndicadoresCategoria() {
-        // Remove classes de categoria anteriores
-        document.querySelectorAll('.shelf[class*="cat-"]').forEach(el => {
-            el.className = el.className.split(' ').filter(c => !c.startsWith('cat-')).join(' ');
+        // Remove classes de categoria anteriores das gôndolas de corredor
+        document.querySelectorAll('.shelf').forEach(el => {
+            _setClass(el, _getClass(el).split(' ').filter(c => !c.startsWith('cat-')).join(' ').trim());
+        });
+        // Reset dos setores fixos
+        Object.values(_setorFixoMap).forEach(id => {
+            const el = document.getElementById(id);
+            if (!el) return;
+            const rect = el.querySelector('rect');
+            if (rect) {
+                rect.style.fill   = '';
+                rect.style.stroke = '';
+                delete rect.dataset.catColorizado;
+            }
         });
 
-        // Mapeia gôndola → categoria
         DB.listar().forEach(p => {
-            const gondola = (p.loja?.gondola || '').toUpperCase();
+            const gondola = (p.loja?.gondola || '').toUpperCase().trim();
             if (!gondola || !p.categoria) return;
             const catCfg = LOJA_CONFIG.categorias[p.categoria];
             if (!catCfg) return;
-            const el = document.getElementById(`gondola-${gondola}`);
+
+            const el = _elPorGondola(gondola);
             if (!el) return;
-            // Só adiciona se ainda não tem uma classe de categoria (primeiro produto vence)
-            if (!el.className.includes('cat-')) {
-                el.classList.add(catCfg.cssClass);
+
+            const isSetor = !!_setorFixoMap[gondola];
+            if (isSetor) {
+                const rect = el.querySelector('rect');
+                if (rect && !rect.dataset.catColorizado) {
+                    rect.style.fill   = catCfg.cor + '33';
+                    rect.style.stroke = catCfg.cor;
+                    rect.dataset.catColorizado = '1';
+                }
+            } else {
+                const cls = _getClass(el);
+                if (!cls.includes('cat-')) {
+                    _setClass(el, (cls + ' ' + catCfg.cssClass).trim());
+                }
             }
         });
     }
@@ -98,8 +142,8 @@ const MapBuilder = (() => {
      */
     function atualizarIndicadoresValidade(ativo) {
         // Remove classes de status de todas as gôndolas
-        document.querySelectorAll('.shelf.status-vencido, .shelf.status-atencao').forEach(el => {
-            el.classList.remove('status-vencido', 'status-atencao');
+        document.querySelectorAll('.shelf').forEach(el => {
+            _setClass(el, _getClass(el).split(' ').filter(c => !c.startsWith('status-')).join(' ').trim());
         });
 
         // Remove pontos de alerta
@@ -120,15 +164,19 @@ const MapBuilder = (() => {
             });
         });
 
-        // Aplica classe no <g> da gôndola
+        // Aplica classe no elemento da gôndola ou setor
         Object.entries(statusMap).forEach(([gondola, status]) => {
             if (status === 'ok') return;
-            const el = document.getElementById(`gondola-${gondola}`);
+            const el = _elPorGondola(gondola);
             if (!el) return;
-            el.classList.add(`status-${status}`);
-
-            // Adiciona ponto de alerta no canto do <g>
-            _adicionarPonto(gondola, status);
+            // Setores fixos não têm classe .shelf, aplica no rect interno
+            if (_setorFixoMap[gondola]) {
+                const rect = el.querySelector('rect');
+                if (rect) rect.style.boxShadow = status === 'vencido' ? '0 0 6px #ef4444' : '0 0 6px #f59e0b';
+            } else {
+                _setClass(el, (_getClass(el) + ' status-' + status).trim());
+                _adicionarPonto(gondola, status);
+            }
         });
     }
 

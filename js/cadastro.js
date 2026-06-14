@@ -61,25 +61,27 @@ const Cadastro = (() => {
         }
 
         const cfg = LOJA_CONFIG.categorias[categoria];
-        sel.innerHTML = '<option value="">— Selecione a gôndola —</option>';
+        sel.innerHTML = '<option value="">— Selecione a posição —</option>';
         cfg.gondolas.forEach(g => {
             const opt = document.createElement('option');
             opt.value = g;
-            opt.textContent = `Gôndola ${g}`;
+            // Se for setor fixo (sem número), exibe só o nome; senão "Gôndola XX"
+            opt.textContent = /^[A-Z]+$/.test(g) ? `🏷️ Setor ${g}` : `Gôndola ${g}`;
             if (g === gondolaAtual) opt.selected = true;
             sel.appendChild(opt);
         });
 
-        // Atualiza o corredor oculto
         if (gondolaAtual) sincronizarCorredorDaGondola();
 
-        // Mostra dica visual
         if (hint) {
             hint.style.display = 'flex';
             hint.style.background = cfg.cor + '22';
             hint.style.borderColor = cfg.cor;
             hint.style.color = cfg.cor;
-            hint.innerHTML = `<span>${cfg.emoji}</span> <strong>${cfg.label}</strong> · Gôndolas permitidas: ${cfg.gondolas.join(', ')}`;
+            const listaLabel = cfg.gondolas.length <= 3
+                ? cfg.gondolas.join(', ')
+                : `${cfg.gondolas.length} posições disponíveis`;
+            hint.innerHTML = `<span>${cfg.emoji}</span> <strong>${cfg.label}</strong> · ${listaLabel}`;
         }
     }
 
@@ -92,10 +94,10 @@ const Cadastro = (() => {
     function sincronizarCorredorDaGondola() {
         const gondola = document.getElementById('campo-loja-gondola')?.value;
         const corrEl  = document.getElementById('campo-loja-corredor');
-        if (!corrEl) return;
-        if (gondola) {
-            corrEl.value = gondola.charAt(0);
-        }
+        if (!corrEl || !gondola) return;
+        // Setor fixo (ex: AÇOUGUE) → corredor é o próprio nome
+        // Gôndola de corredor (ex: A3) → corredor é a primeira letra
+        corrEl.value = /^[A-ZÁÉÍÓÚÂÊÎÔÛÃÕ]+$/.test(gondola) ? gondola : gondola.charAt(0);
     }
 
     function _renderizarValidades(produtoId, validades) {
@@ -241,11 +243,14 @@ const ListaProdutos = (() => {
 
         const filtrados = lista.filter(p => {
             const t = _termo.toLowerCase();
+            const catLabel = (LOJA_CONFIG.categorias[p.categoria]?.label || '').toLowerCase();
             return p.nome.toLowerCase().includes(t) ||
                    p.id.toLowerCase().includes(t) ||
                    p.empresa.toLowerCase().includes(t) ||
                    (p.loja?.gondola  || '').toLowerCase().includes(t) ||
-                   (p.loja?.corredor || '').toLowerCase().includes(t);
+                   (p.loja?.corredor || '').toLowerCase().includes(t) ||
+                   (p.categoria      || '').toLowerCase().includes(t) ||
+                   catLabel.includes(t);
         });
 
         container.innerHTML = filtrados.length === 0
@@ -284,14 +289,16 @@ const ListaProdutos = (() => {
         return `
         <div class="produto-card ${status === 'vencido' ? 'card-vencido' : status === 'atencao' ? 'card-atencao' : ''}">
             <div class="card-top">
-                <span class="produto-id">${p.id}</span>
+                <div class="card-top-linha">
+                    <span class="produto-id">${p.id}</span>
+                    <span class="produto-empresa">${p.empresa}</span>
+                    ${isFuncionario ? `
+                    <div class="card-acoes">
+                        <button class="btn-acao editar"  onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar">✏️</button>
+                        <button class="btn-acao excluir" onclick="Cadastro.excluirProduto('${p.id}')" title="Excluir">🗑️</button>
+                    </div>` : ''}
+                </div>
                 ${catBadge}
-                <span class="produto-empresa">${p.empresa}</span>
-                ${isFuncionario ? `
-                <div class="card-acoes">
-                    <button class="btn-acao editar"  onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar">✏️</button>
-                    <button class="btn-acao excluir" onclick="Cadastro.excluirProduto('${p.id}')" title="Excluir">🗑️</button>
-                </div>` : ''}
             </div>
             <h3 class="produto-nome">${p.nome}</h3>
             <div class="produto-info-grid">
