@@ -1,80 +1,74 @@
-# AtacadoPro — Localizador de Produtos
+# AtacadoPro — operações e localização de produtos em atacado
 
-Mapa interativo de supermercado atacadista com dark mode, geração dinâmica de gôndolas e roteamento visual até o produto.
+Aplicação web de estudos que reúne **mapa interativo de uma loja**, localização de produtos e módulos simulados de cadastro, estoque e caixa.
 
----
+## O que o projeto demonstra
 
-## 📁 Estrutura do Projeto
+- **Mapa de loja:** corredores, setores e gôndolas gerados e manipulados em SVG.
+- **Roteamento visual:** interação com o mapa para indicar caminhos até produtos/setores.
+- **Cadastro e estoque:** produtos, quantidades e acompanhamento de lotes com datas de validade.
+- **Caixa:** fluxo demonstrativo de vendas, com histórico armazenado no navegador.
+- **Perfis simulados:** modos de visualização para cliente, administração, conferência e caixa.
+- **Importação/exportação:** operações com JSON e planilhas, conforme os recursos implementados.
 
-```
-AtacadoPro/
-│
-├── index.html              ← Ponto de entrada principal
-│
+## Tecnologias da versão atual
+
+- HTML5, CSS3 e JavaScript puro.
+- SVG para visualização da planta da loja.
+- LocalStorage para guardar dados no navegador.
+- Biblioteca XLSX para recursos de planilhas (quando carregada no ambiente).
+
+> **Limitação importante:** os perfis do arquivo `js/auth.js` representam apenas um controle demonstrativo de interface. **Não são login, autenticação ou autorização seguros.** Não há backend ou banco de dados de servidor nesta versão.
+
+## Organização
+
+```text
+atacadoPro/
+├── index.html
 ├── css/
-│   ├── variables.css       ← Design tokens (cores, espaçamentos, tipografia)
-│   └── styles.css          ← Layout, componentes e animações
-│
+│   ├── variables.css
+│   ├── styles.css
+│   ├── cadastro.css
+│   ├── dashboard.css
+│   └── caixa.css
 └── js/
-    ├── map.config.js       ← Configuração da loja (corredores, setores, dimensões)
-    ├── map.builder.js      ← Geração dinâmica dos elementos SVG
-    └── map.router.js       ← Motor de roteamento e interações do mapa
+    ├── auth.js
+    ├── cadastro.js
+    ├── caixa.js
+    ├── db.js
+    ├── map.config.js
+    ├── map.builder.js
+    └── map.router.js
 ```
 
----
+**Principais responsabilidades:**
 
-## 🧩 Responsabilidades dos Arquivos JS
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `js/map.config.js` | Configuração da loja e posições de corredores e setores |
+| `js/map.builder.js` | Montagem visual do mapa SVG |
+| `js/map.router.js` | Cálculo e representação de rotas no mapa |
+| `js/db.js` | Produtos, lotes, vendas e importação/exportação local |
+| `js/cadastro.js` | Interface e operações de cadastro |
+| `js/caixa.js` | Fluxos de caixa e vendas |
+| `js/auth.js` | Troca de perfis simulados na interface |
 
-| Arquivo          | O que faz                                                      |
-|------------------|----------------------------------------------------------------|
-| `map.config.js`  | Dados e dimensões da loja. **Edite aqui** para expandir.       |
-| `map.builder.js` | Lê o config e gera os `<g>` das prateleiras e caixas no SVG.  |
-| `map.router.js`  | Calcula o caminho, anima a rota e atualiza o painel lateral.   |
+## Executar localmente
 
----
-
-## ✏️ Como adicionar um novo corredor
-
-Abra `js/map.config.js` e adicione ao array `corredores`:
-
-```js
-{ id: 'H', x: 1010, color: 'var(--cor-a)' },
-```
-
-Nenhum outro arquivo precisa ser alterado.
-
----
-
-## ✏️ Como mudar as cores
-
-Abra `css/variables.css` e altere os valores das variáveis CSS. As mudanças se propagam automaticamente por todo o projeto.
-
----
-
-## 🚀 Como rodar
-
-Abra o `index.html` diretamente no navegador **ou** use um servidor local:
+Clone ou baixe o repositório. Na pasta do projeto, você pode usar um servidor local:
 
 ```bash
-# Python 3
-python -m http.server 8080
-
-# Node.js (npx)
 npx serve .
 ```
 
-Depois acesse `http://localhost:8080`.
+Abra a URL informada pelo comando. Como alternativa, experimente abrir `index.html` diretamente no navegador.
 
----
+## Limitações e oportunidades de evolução
 
-## 🛠️ Melhorias implementadas
+O projeto usa dados locais e não é adequado, nessa versão, para transações reais, autenticação de funcionários ou múltiplos dispositivos. Etapas futuras possíveis: API de produtos, banco relacional, login seguro, testes e deploy.
 
-- **Separação de responsabilidades** (HTML, CSS e JS em arquivos dedicados)
-- **Design Tokens centralizados** em `variables.css`
-- **Padrão de módulo JS** (`IIFE`) com `MapBuilder` e `MapRouter` — sem poluição do escopo global
-- **Configuração externalizada** — adicionar corredores/setores não exige mexer na lógica
-- **Cache de elementos DOM** no roteador (evita `querySelector` repetido)
-- **Animação de entrada** no painel de informação
-- **Acessibilidade básica**: `aria-label`, `aria-live`, `role="img"`, `user-select: none`
-- **Responsividade** para telas menores
-- **`prefers-reduced-motion`** respeitado
+## Objetivo de aprendizagem
+
+Estudar organização de JavaScript, manipulação de DOM/SVG, estruturas de dados e regras de negócio a partir de um problema de varejo.
+
+[Perfil no GitHub](https://github.com/LuizAlbertoDev)
