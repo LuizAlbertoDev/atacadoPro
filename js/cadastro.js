@@ -66,7 +66,7 @@ const Cadastro = (() => {
             const opt = document.createElement('option');
             opt.value = g;
             // Se for setor fixo (sem número), exibe só o nome; senão "Gôndola XX"
-            opt.textContent = /^[A-Z]+$/.test(g) ? `🏷️ Setor ${g}` : `Gôndola ${g}`;
+            opt.textContent = /^[A-Z]+$/.test(g) ? ` Setor ${g}` : `Gôndola ${g}`;
             if (g === gondolaAtual) opt.selected = true;
             sel.appendChild(opt);
         });
@@ -81,7 +81,7 @@ const Cadastro = (() => {
             const listaLabel = cfg.gondolas.length <= 3
                 ? cfg.gondolas.join(', ')
                 : `${cfg.gondolas.length} posições disponíveis`;
-            hint.innerHTML = `<span>${cfg.emoji}</span> <strong>${cfg.label}</strong> · ${listaLabel}`;
+            hint.innerHTML = `<strong>${cfg.label}</strong> · ${listaLabel}`;
         }
     }
 
@@ -115,7 +115,7 @@ const Cadastro = (() => {
                         <span class="val-qtd">${v.quantidade} un.</span>
                         <span class="badge-validade ${status} val-badge">${status === 'vencido' ? 'VENCIDO' : status === 'atencao' ? 'ATENÇÃO' : 'OK'}</span>
                     </div>
-                    ${!isNovo ? `<button class="btn-excluir-val" onclick="Cadastro.excluirValidade('${produtoId}','${v.id}')">🗑️</button>` : ''}
+                    ${!isNovo ? `<button class="btn-excluir-val" onclick="Cadastro.excluirValidade('${produtoId}','${v.id}')">Excluir</button>` : ''}
                 </div>`;
             }).join('');
     }
@@ -185,7 +185,7 @@ const Cadastro = (() => {
         // Valida que a gôndola pertence à categoria
         const catCfg = LOJA_CONFIG.categorias[categoria];
         if (catCfg && !catCfg.gondolas.includes(gondola.toUpperCase())) {
-            alert(`❌ A gôndola "${gondola}" não pertence à categoria "${catCfg.label}".\n\nGôndolas permitidas: ${catCfg.gondolas.join(', ')}`);
+            alert(` A gôndola "${gondola}" não pertence à categoria "${catCfg.label}".\n\nGôndolas permitidas: ${catCfg.gondolas.join(', ')}`);
             return;
         }
 
@@ -280,7 +280,7 @@ const ListaProdutos = (() => {
                     return `<div class="val-row">
                         <span class="badge-validade ${s}">${v.data}</span>
                         <span class="val-qtd-row">${v.quantidade} un.</span>
-                        <button class="btn-excluir-val-inline" onclick="Cadastro.excluirValidade('${p.id}','${v.id}');ListaProdutos.renderizar()">🗑️</button>
+                        <button class="btn-excluir-val-inline" onclick="Cadastro.excluirValidade('${p.id}','${v.id}');ListaProdutos.renderizar()">Excluir</button>
                     </div>`;
                 }).join('')}
                 <button class="btn-add-val-inline" onclick="Cadastro.abrirFormulario('${p.id}')">+ Adicionar lote</button>
@@ -294,8 +294,8 @@ const ListaProdutos = (() => {
                     <span class="produto-empresa">${p.empresa}</span>
                     ${isFuncionario ? `
                     <div class="card-acoes">
-                        <button class="btn-acao editar"  onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar">✏️</button>
-                        <button class="btn-acao excluir" onclick="Cadastro.excluirProduto('${p.id}')" title="Excluir">🗑️</button>
+                        <button class="btn-acao editar"  onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar">Editar</button>
+                        <button class="btn-acao excluir" onclick="Cadastro.excluirProduto('${p.id}')" title="Excluir">Excluir</button>
                     </div>` : ''}
                 </div>
                 ${catBadge}
@@ -331,7 +331,7 @@ const ListaProdutos = (() => {
                 ` : ''}
             </div>
             <button class="btn-localizar" onclick="App.irParaMapa('${p.loja?.gondola||''}','${p.nome.replace(/'/g,"\\'")}')">
-                📍 Localizar no Mapa
+                 Localizar no Mapa
             </button>
         </div>`;
     }
@@ -394,35 +394,30 @@ const Dashboard = (() => {
         <!-- Cards de resumo -->
         <div class="dash-cards">
             <div class="dash-card">
-                <div class="dash-card-icon">📦</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">${totalProdutos}</div>
                     <div class="dash-card-label">Produtos Cadastrados</div>
                 </div>
             </div>
             <div class="dash-card">
-                <div class="dash-card-icon">🔢</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">${totalItens.toLocaleString('pt-BR')}</div>
                     <div class="dash-card-label">Unidades em Estoque</div>
                 </div>
             </div>
             <div class="dash-card ${vencidos.length > 0 ? 'card-alerta' : ''}">
-                <div class="dash-card-icon">🚨</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">${vencidos.length}</div>
                     <div class="dash-card-label">Lotes Vencidos</div>
                 </div>
             </div>
             <div class="dash-card ${vencendo30.length > 0 ? 'card-atencao-bg' : ''}">
-                <div class="dash-card-icon">⚠️</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">${vencendo30.length}</div>
                     <div class="dash-card-label">Vencem em 30 dias</div>
                 </div>
             </div>
             <div class="dash-card">
-                <div class="dash-card-icon">💰</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">R$ ${totalValor.toLocaleString('pt-BR', {minimumFractionDigits:2})}</div>
                     <div class="dash-card-label">Valor Total em Estoque</div>
@@ -439,17 +434,17 @@ const Dashboard = (() => {
         <!-- Alertas de validade -->
         <div class="dash-secoes">
             <div class="dash-secao">
-                <div class="dash-secao-titulo">🚨 Lotes Vencidos (${vencidos.length})</div>
+                <div class="dash-secao-titulo"> Lotes Vencidos (${vencidos.length})</div>
                 ${vencidos.length === 0
-                    ? `<div class="dash-vazia">Nenhum lote vencido. ✅</div>`
+                    ? `<div class="dash-vazia">Nenhum lote vencido. </div>`
                     : vencidos.slice(0, 8).map(({ p, v, status }) => _loteCard(p, v, status)).join('')
                 }
                 ${vencidos.length > 8 ? `<button class="btn-ver-todos dash-btn-link" onclick="Dashboard.abrirValidades('vencido')">Ver todos os vencidos</button>` : ''}
             </div>
             <div class="dash-secao">
-                <div class="dash-secao-titulo">⚠️ Vencem nos Próximos 30 Dias (${vencendo30.length})</div>
+                <div class="dash-secao-titulo"> Vencem nos Próximos 30 Dias (${vencendo30.length})</div>
                 ${vencendo30.length === 0
-                    ? `<div class="dash-vazia">Nenhum lote vencendo em breve. ✅</div>`
+                    ? `<div class="dash-vazia">Nenhum lote vencendo em breve. </div>`
                     : vencendo30.slice(0, 8).map(({ p, v, status }) => _loteCard(p, v, status)).join('')
                 }
                 ${vencendo30.length > 8 ? `<button class="btn-ver-todos dash-btn-link" onclick="Dashboard.abrirValidades('atencao')">Ver todos os alertas</button>` : ''}
@@ -527,15 +522,15 @@ const Dashboard = (() => {
             <div class="dash-lote-topo">
                 <span class="produto-id">${p.id}</span>
                 <span class="dash-lote-empresa">${p.empresa}</span>
-                <button class="btn-acao excluir" onclick="Dashboard.excluirLote('${p.id}','${v.id}')" title="Excluir lote">🗑️</button>
+                <button class="btn-acao excluir" onclick="Dashboard.excluirLote('${p.id}','${v.id}')" title="Excluir lote">Excluir</button>
             </div>
             <div class="dash-lote-nome">${p.nome}</div>
             <div class="dash-lote-info">
-                <span>📅 ${v.data}</span>
-                <span>📦 ${v.quantidade} un.</span>
+                <span> ${v.data}</span>
+                <span> ${v.quantidade} un.</span>
                 <span class="badge-validade ${status}">${status === 'vencido' ? `Vencido há ${Math.abs(dias)}d` : `Vence em ${dias}d`}</span>
             </div>
-            <div class="dash-lote-local">📍 ${p.loja?.corredor||'—'} · ${p.loja?.gondola||'—'} &nbsp;|&nbsp; 🏭 ${p.deposito?.corredor||'—'}</div>
+            <div class="dash-lote-local"> ${p.loja?.corredor||'—'} · ${p.loja?.gondola||'—'} &nbsp;|&nbsp;  ${p.deposito?.corredor||'—'}</div>
         </div>`;
     }
 
@@ -621,7 +616,7 @@ const Dashboard = (() => {
             <td>${v.quantidade} un.</td>
             <td>${p.loja?.corredor || '—'} · ${p.loja?.gondola || '—'}</td>
             <td>Corr. ${p.deposito?.corredor || '—'} · Arm. ${p.deposito?.armario || '—'} · Prat. ${p.deposito?.prateleira || '—'}</td>
-            <td class="dash-print-hide"><button class="btn-acao excluir" onclick="Dashboard.excluirLote('${p.id}','${v.id}')" title="Excluir lote">🗑️</button></td>
+            <td class="dash-print-hide"><button class="btn-acao excluir" onclick="Dashboard.excluirLote('${p.id}','${v.id}')" title="Excluir lote">Excluir</button></td>
         </tr>`;
     }
 
@@ -713,21 +708,18 @@ const Historico = (() => {
         return `
         <div class="dash-cards">
             <div class="dash-card">
-                <div class="dash-card-icon">💰</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">R$ ${totalHoje.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                     <div class="dash-card-label">Total Vendido Hoje</div>
                 </div>
             </div>
             <div class="dash-card">
-                <div class="dash-card-icon">🛒</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">${qtdVendas}</div>
                     <div class="dash-card-label">Vendas Hoje</div>
                 </div>
             </div>
             <div class="dash-card">
-                <div class="dash-card-icon">📊</div>
                 <div class="dash-card-info">
                     <div class="dash-card-valor">R$ ${ticketMedio.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                     <div class="dash-card-label">Ticket Médio</div>
@@ -737,7 +729,7 @@ const Historico = (() => {
 
         <div class="dash-secoes">
             <div class="dash-secao">
-                <div class="dash-secao-titulo">💳 Resumo por Forma de Pagamento</div>
+                <div class="dash-secao-titulo"> Resumo por Forma de Pagamento</div>
                 <table class="dash-tabela">
                     <thead><tr><th>Forma</th><th>Total</th><th>%</th></tr></thead>
                     <tbody>
@@ -760,7 +752,7 @@ const Historico = (() => {
         if (_filtroPag) filtradas = filtradas.filter(v => v.pagamento === _filtroPag);
 
         const total = filtradas.reduce((s, v) => s + v.total, 0);
-        const pagLabel = { dinheiro: '💵 Dinheiro', cartao_debito: '💳 Débito', cartao_credito: '💳 Crédito', pix: '📲 PIX' };
+        const pagLabel = { dinheiro: ' Dinheiro', cartao_debito: ' Débito', cartao_credito: ' Crédito', pix: ' PIX' };
 
         return `
         <div class="dash-validade">
@@ -769,7 +761,7 @@ const Historico = (() => {
                     <div class="dash-secao-titulo">Histórico de Vendas</div>
                     <div class="dash-relatorio-sub">${filtradas.length} venda(s) · R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
                 </div>
-                <button class="btn-secundario" onclick="Historico.limpar()">🗑️ Limpar Histórico</button>
+                <button class="btn-secundario" onclick="Historico.limpar()"> Limpar Histórico</button>
             </div>
 
             <div class="dash-filtros dash-print-hide">
@@ -872,7 +864,7 @@ const EstoqueBaixo = (() => {
         container.innerHTML = `
         <div class="dash-validade-header">
             <div>
-                <div class="dash-secao-titulo">⚠️ Estoque Baixo</div>
+                <div class="dash-secao-titulo"> Estoque Baixo</div>
                 <div class="dash-relatorio-sub">${baixo.length} produto(s) com ≤ ${_limite} unidades</div>
             </div>
             <label class="dash-filtro" style="flex-direction:row;align-items:center;gap:8px">
@@ -883,7 +875,7 @@ const EstoqueBaixo = (() => {
         </div>
 
         ${baixo.length === 0
-            ? `<div class="dash-vazia">Nenhum produto abaixo do limite. ✅</div>`
+            ? `<div class="dash-vazia">Nenhum produto abaixo do limite. </div>`
             : `<table class="dash-tabela dash-relatorio-tabela">
                 <thead><tr>
                     <th>Código</th><th>Produto</th><th>Empresa</th>
@@ -900,7 +892,7 @@ const EstoqueBaixo = (() => {
                         <td>${p.loja?.corredor || '—'} · ${p.loja?.gondola || '—'}</td>
                         <td>Corr. ${p.deposito?.corredor || '—'} · Arm. ${p.deposito?.armario || '—'} · Prat. ${p.deposito?.prateleira || '—'}</td>
                         <td class="dash-print-hide">
-                            <button class="btn-acao editar" onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar/Repor">✏️</button>
+                            <button class="btn-acao editar" onclick="Cadastro.abrirFormulario('${p.id}')" title="Editar/Repor">Editar</button>
                         </td>
                     </tr>`).join('')}
                 </tbody>

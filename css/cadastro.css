@@ -551,3 +551,6 @@
 @media (max-width: 640px) {
     .categoria-hint { font-size: 11px; flex-wrap: wrap; }
 }
+/* Ações com rótulos textuais */
+.btn-acao { color: var(--text-main); padding: 5px 9px; }
+.login-card-icon { display: none; }

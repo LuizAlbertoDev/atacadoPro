@@ -56,7 +56,7 @@ const LOJA_CONFIG = {
     categorias: {
         acougue: {
             label:   'Açougue',
-            emoji:   '🥩',
+            emoji:   '',
             cor:     '#ef4444',
             cssClass:'cat-acougue',
             gondolas: ['AÇOUGUE'],   // setor fixo no mapa
@@ -64,7 +64,7 @@ const LOJA_CONFIG = {
         },
         frios: {
             label:   'Frios',
-            emoji:   '🧀',
+            emoji:   '',
             cor:     '#0ea5e9',
             cssClass:'cat-frios',
             gondolas: ['FRIOS'],
@@ -72,7 +72,7 @@ const LOJA_CONFIG = {
         },
         horti: {
             label:   'Hortifruti',
-            emoji:   '🥦',
+            emoji:   '',
             cor:     '#10b981',
             cssClass:'cat-horti',
             gondolas: ['HORTIFRUTI'],
@@ -80,7 +80,7 @@ const LOJA_CONFIG = {
         },
         padaria: {
             label:   'Padaria',
-            emoji:   '🍞',
+            emoji:   '',
             cor:     '#f59e0b',
             cssClass:'cat-padaria',
             gondolas: ['PADARIA'],
@@ -88,7 +88,7 @@ const LOJA_CONFIG = {
         },
         bebidas: {
             label:   'Bebidas',
-            emoji:   '🥤',
+            emoji:   '',
             cor:     '#3b82f6',
             cssClass:'cat-bebidas',
             gondolas: ['BEBIDAS'],
@@ -96,7 +96,7 @@ const LOJA_CONFIG = {
         },
         adega: {
             label:   'Adega',
-            emoji:   '🍷',
+            emoji:   '',
             cor:     '#a855f7',
             cssClass:'cat-adega',
             gondolas: ['ADEGA'],
@@ -104,7 +104,7 @@ const LOJA_CONFIG = {
         },
         geral: {
             label:   'Mercearia Geral',
-            emoji:   '🛒',
+            emoji:   '',
             cor:     '#9ca3af',
             cssClass:'cat-geral',
             gondolas: ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10',

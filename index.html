@@ -17,26 +17,22 @@
 <div id="login-overlay" class="login-overlay">
     <div class="login-logo">
         <h1>AtacadoPro</h1>
-        <p>Sistema de Gestão · Como deseja entrar?</p>
+        <p>Simulação de gestão de atacado · Selecione um perfil</p>
     </div>
     <div class="login-cards">
         <div class="login-card cliente" onclick="Auth.login('cliente')">
-            <div class="login-card-icon">👤</div>
             <div class="login-card-label">Cliente</div>
             <div class="login-card-desc">Ver mapa e produtos</div>
         </div>
         <div class="login-card caixa" onclick="Auth.login('caixa')">
-            <div class="login-card-icon">🏧</div>
             <div class="login-card-label">Caixa</div>
             <div class="login-card-desc">Registrar vendas</div>
         </div>
         <div class="login-card conferente" onclick="Auth.login('conferente')">
-            <div class="login-card-icon">📋</div>
             <div class="login-card-label">Conferente</div>
             <div class="login-card-desc">Conferência de estoque</div>
         </div>
         <div class="login-card admin" onclick="Auth.login('admin')">
-            <div class="login-card-icon">🛡️</div>
             <div class="login-card-label">Admin</div>
             <div class="login-card-desc">Acesso completo</div>
         </div>
@@ -48,19 +44,19 @@
     <h1>AtacadoPro <span>| Localizador de Produtos</span></h1>
     <div class="header-right">
         <span id="perfil-tag"></span>
-        <button id="btn-login" class="btn-login-header" onclick="Auth.toggleLogin()">🔑 Login</button>
-        <div class="status-badge">SISTEMA ONLINE</div>
+        <button id="btn-login" class="btn-login-header" onclick="Auth.toggleLogin()"> Login</button>
+        <div class="status-badge">MODO DEMONSTRAÇÃO</div>
     </div>
 </header>
 
 <nav class="app-tabs">
-    <button class="tab-btn ativo"                    onclick="App.mudarAba('mapa')">🗺️ Mapa</button>
-    <button class="tab-btn"                          onclick="App.mudarAba('produtos')">📦 Produtos</button>
-    <button class="tab-btn tab-deposito so-funcionario" style="display:none" onclick="App.mudarAba('deposito')">🏭 Depósito</button>
-    <button class="tab-btn tab-caixa"  style="display:none" onclick="App.mudarAba('caixa')">🏧 Caixa</button>
-    <button class="tab-btn tab-dashboard so-admin" style="display:none" onclick="App.mudarAba('dashboard')">📊 Dashboard</button>
-    <button class="tab-btn tab-historico so-admin" style="display:none" onclick="App.mudarAba('historico')">🧾 Vendas</button>
-    <button class="tab-btn tab-estoque so-admin" style="display:none" onclick="App.mudarAba('estoque-baixo')">📉 Estoque Baixo</button>
+    <button class="tab-btn ativo"                    onclick="App.mudarAba('mapa')"> Mapa</button>
+    <button class="tab-btn"                          onclick="App.mudarAba('produtos')"> Produtos</button>
+    <button class="tab-btn tab-deposito so-funcionario" style="display:none" onclick="App.mudarAba('deposito')"> Depósito</button>
+    <button class="tab-btn tab-caixa"  style="display:none" onclick="App.mudarAba('caixa')"> Caixa</button>
+    <button class="tab-btn tab-dashboard so-admin" style="display:none" onclick="App.mudarAba('dashboard')"> Dashboard</button>
+    <button class="tab-btn tab-historico so-admin" style="display:none" onclick="App.mudarAba('historico')"> Vendas</button>
+    <button class="tab-btn tab-estoque so-admin" style="display:none" onclick="App.mudarAba('estoque-baixo')"> Estoque Baixo</button>
 </nav>
 
 <!-- ===== MAPA ===== -->
@@ -71,45 +67,45 @@
             <rect x="20" y="20" width="120" height="120" rx="6" style="stroke:var(--cor-acougue)"/>
             <text x="80" y="70"  class="section-text" style="fill:var(--cor-acougue)">AÇOUGUE</text>
             <text x="80" y="95"  class="sub-text">CARNES</text>
-            <text x="80" y="115" class="sub-text" style="fill:var(--cor-acougue);font-size:9px">🥩 A1–A5</text>
+            <text x="80" y="115" class="sub-text" style="fill:var(--cor-acougue);font-size:9px"> A1–A5</text>
         </g>
         <g class="section" id="setor-frios"      onclick="MapRouter.tracarRota('Frios','Laticínios e Embutidos',80,240)" data-categoria="frios">
             <rect x="20" y="150" width="120" height="180" rx="6" style="stroke:var(--cor-frios)"/>
             <text x="80" y="215" class="section-text" style="fill:var(--cor-frios)">FRIOS</text>
             <text x="80" y="238" class="sub-text">LATICÍNIOS</text>
             <text x="80" y="256" class="sub-text">QUEIJOS</text>
-            <text x="80" y="274" class="sub-text" style="fill:var(--cor-frios);font-size:9px">🧀 A6–B3</text>
+            <text x="80" y="274" class="sub-text" style="fill:var(--cor-frios);font-size:9px"> A6–B3</text>
         </g>
         <g class="section" id="setor-hortifruti" onclick="MapRouter.tracarRota('Hortifruti','Frutas e Verduras',80,430)" data-categoria="horti">
             <rect x="20" y="340" width="120" height="180" rx="6" style="stroke:var(--cor-horti)"/>
             <text x="80" y="405" class="section-text" style="fill:var(--cor-horti)">HORTIFRUTI</text>
             <text x="80" y="428" class="sub-text">FRUTAS</text>
             <text x="80" y="446" class="sub-text">VERDURAS</text>
-            <text x="80" y="464" class="sub-text" style="fill:var(--cor-horti);font-size:9px">🥦 B4–B10</text>
+            <text x="80" y="464" class="sub-text" style="fill:var(--cor-horti);font-size:9px"> B4–B10</text>
         </g>
         <g class="section" id="setor-padaria"    onclick="MapRouter.tracarRota('Padaria','Pães e Bolos',80,620)" data-categoria="padaria">
             <rect x="20" y="530" width="120" height="140" rx="6" style="stroke:var(--cor-padaria)"/>
             <text x="80" y="585" class="section-text" style="fill:var(--cor-padaria)">PADARIA</text>
             <text x="80" y="608" class="sub-text">PÃES QUENTES</text>
-            <text x="80" y="626" class="sub-text" style="fill:var(--cor-padaria);font-size:9px">🍞 C1–C5</text>
+            <text x="80" y="626" class="sub-text" style="fill:var(--cor-padaria);font-size:9px"> C1–C5</text>
         </g>
         <g class="section" id="setor-bebidas"    onclick="MapRouter.tracarRota('Bebidas','Águas, Sucos e Refri',1120,160)" data-categoria="bebidas">
             <rect x="1060" y="20" width="120" height="280" rx="6" style="stroke:var(--cor-b)"/>
             <text x="1120" y="130" class="section-text" style="fill:var(--cor-b)">BEBIDAS</text>
             <text x="1120" y="155" class="sub-text">ÁGUAS & SUCOS</text>
-            <text x="1120" y="175" class="sub-text" style="fill:var(--cor-b);font-size:9px">🥤 C6–D5</text>
+            <text x="1120" y="175" class="sub-text" style="fill:var(--cor-b);font-size:9px"> C6–D5</text>
         </g>
         <g class="section" id="setor-adega"      onclick="MapRouter.tracarRota('Adega','Vinhos e Destilados',1120,380)" data-categoria="adega">
             <rect x="1060" y="310" width="120" height="140" rx="6" style="stroke:var(--cor-d)"/>
             <text x="1120" y="368" class="section-text" style="fill:var(--cor-d)">ADEGA</text>
             <text x="1120" y="390" class="sub-text">VINHOS</text>
-            <text x="1120" y="410" class="sub-text" style="fill:var(--cor-d);font-size:9px">🍷 D6–E3</text>
+            <text x="1120" y="410" class="sub-text" style="fill:var(--cor-d);font-size:9px"> D6–E3</text>
         </g>
         <g class="section" id="setor-deposito"   onclick="App.mudarAba('deposito')" style="cursor:pointer" title="Ver mapa do depósito">
             <rect x="1060" y="460" width="120" height="120" rx="6"/>
             <text x="1120" y="510" class="section-text">DEPÓSITO</text>
             <text x="1120" y="535" class="sub-text">RESTRITO</text>
-            <text x="1120" y="558" class="sub-text" style="fill:var(--accent);font-size:9px">▶ Ver mapa</text>
+            <text x="1120" y="558" class="sub-text" style="fill:var(--accent);font-size:9px"> Ver mapa</text>
         </g>
         <g class="section" id="setor-sanitarios" onclick="MapRouter.tracarRota('Sanitários','WC Clientes',1120,640)">
             <rect x="1060" y="590" width="120" height="80" rx="6"/>
@@ -128,7 +124,7 @@
         <circle id="ponto-fim"    class="node-end"   r="8"  cx="0" cy="0" style="display:none"/>
     </svg>
     <aside class="info-panel" id="info-panel" aria-live="polite">
-        <button class="close-btn" onclick="MapRouter.limparRota()">✖</button>
+        <button class="close-btn" onclick="MapRouter.limparRota()" aria-label="Fechar">&times;</button>
         <span class="info-label">Destino Selecionado</span>
         <h3 id="info-titulo">--</h3>
         <p  id="info-desc">--</p>
@@ -144,12 +140,12 @@
 <div id="tela-produtos" style="display:none;">
     <div class="produtos-toolbar">
         <input type="text" class="input-busca" id="campo-busca"
-               placeholder="🔍 Buscar por nome, código, empresa ou gôndola..."
+               placeholder="Buscar por nome, código, empresa ou gôndola..."
                oninput="ListaProdutos.buscar(this.value)" />
         <button class="btn-primario so-admin"   style="display:none" onclick="Cadastro.abrirFormulario()">+ Novo Produto</button>
-        <button class="btn-secundario so-admin" style="display:none" onclick="DB.exportarExcel()">⬇ Excel</button>
-        <button class="btn-secundario so-admin" style="display:none" onclick="DB.exportarJSON()">⬇ JSON</button>
-        <button class="btn-secundario so-admin" style="display:none" onclick="document.getElementById('input-importar').click()">⬆ Importar</button>
+        <button class="btn-secundario so-admin" style="display:none" onclick="DB.exportarExcel()"> Excel</button>
+        <button class="btn-secundario so-admin" style="display:none" onclick="DB.exportarJSON()"> JSON</button>
+        <button class="btn-secundario so-admin" style="display:none" onclick="document.getElementById('input-importar').click()"> Importar</button>
         <input type="file" id="input-importar" accept=".json,.xlsx" style="display:none" onchange="App.importar(this)"/>
     </div>
     <div id="lista-produtos"></div>
@@ -161,14 +157,14 @@
         <!-- Busca -->
         <div class="caixa-busca-wrap">
             <input type="text" id="caixa-busca" class="caixa-busca-input"
-                   placeholder="🔍 Digite o código (PRD001) ou nome do produto..."
+                   placeholder="Digite o código (PRD001) ou nome do produto..."
                    oninput="Caixa.buscarProduto(this.value)"
                    onkeydown="if(event.key==='Escape'){this.value='';Caixa.buscarProduto('')}" />
             <div id="caixa-resultados"></div>
         </div>
         <!-- Carrinho -->
         <div class="caixa-carrinho-wrap">
-            <div class="caixa-carrinho-titulo">🛒 Carrinho</div>
+            <div class="caixa-carrinho-titulo"> Carrinho</div>
             <div id="caixa-carrinho"></div>
         </div>
     </div>
@@ -176,7 +172,7 @@
     <!-- Painel de pagamento -->
     <div class="caixa-direita">
         <div class="caixa-pagamento-box">
-            <div class="caixa-pagamento-titulo">💳 Pagamento</div>
+            <div class="caixa-pagamento-titulo"> Pagamento</div>
 
             <div class="caixa-total-display">
                 <div class="caixa-total-label">Total a Pagar</div>
@@ -187,10 +183,10 @@
             <div>
                 <div style="font-size:11px;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Forma de Pagamento</div>
                 <div class="pagamento-opcoes">
-                    <button class="pag-opt selecionado" onclick="App.selecionarPagamento('dinheiro',this)">💵 Dinheiro</button>
-                    <button class="pag-opt" onclick="App.selecionarPagamento('cartao_debito',this)">💳 Débito</button>
-                    <button class="pag-opt" onclick="App.selecionarPagamento('cartao_credito',this)">💳 Crédito</button>
-                    <button class="pag-opt" onclick="App.selecionarPagamento('pix',this)">⚡ PIX</button>
+                    <button class="pag-opt selecionado" onclick="App.selecionarPagamento('dinheiro',this)"> Dinheiro</button>
+                    <button class="pag-opt" onclick="App.selecionarPagamento('cartao_debito',this)"> Débito</button>
+                    <button class="pag-opt" onclick="App.selecionarPagamento('cartao_credito',this)"> Crédito</button>
+                    <button class="pag-opt" onclick="App.selecionarPagamento('pix',this)"> PIX</button>
                 </div>
             </div>
 
@@ -205,8 +201,8 @@
                 </div>
             </div>
 
-            <button class="btn-finalizar" onclick="Caixa.finalizarVenda()">✅ Finalizar Venda</button>
-            <button class="btn-limpar-caixa" onclick="App.limparCaixa()">🗑️ Limpar Carrinho</button>
+            <button class="btn-finalizar" onclick="Caixa.finalizarVenda()"> Finalizar Venda</button>
+            <button class="btn-limpar-caixa" onclick="App.limparCaixa()"> Limpar Carrinho</button>
         </div>
     </div>
 </div>
@@ -392,13 +388,13 @@
     </svg>
     <!-- Painel info depósito -->
     <aside class="info-panel" id="info-panel-dep" aria-live="polite" style="display:none">
-        <button class="close-btn" onclick="document.getElementById('info-panel-dep').style.display='none'">✖</button>
+        <button class="close-btn" onclick="document.getElementById('info-panel-dep').style.display='none'" aria-label="Fechar">&times;</button>
         <span class="info-label">Posição no Depósito</span>
         <h3 id="dep-info-titulo">--</h3>
         <p  id="dep-info-produtos">--</p>
     </aside>
     <!-- Botão voltar ao mapa da loja -->
-    <button class="dep-btn-voltar" onclick="App.mudarAba('mapa')" title="Voltar ao mapa da loja">🗺️ Mapa da Loja</button>
+    <button class="dep-btn-voltar" onclick="App.mudarAba('mapa')" title="Voltar ao mapa da loja"> Mapa da Loja</button>
 </div>
 
 <!-- ===== DASHBOARD ===== -->
@@ -436,7 +432,7 @@
                 </div>
             </div>
             <div class="form-secao">
-                <div class="form-secao-titulo">📍 Endereço na Loja</div>
+                <div class="form-secao-titulo"> Endereço na Loja</div>
                 <div id="categoria-hint" class="categoria-hint" style="display:none"></div>
                 <div class="form-group">
                     <label>Gôndola</label>
@@ -447,7 +443,7 @@
                 <input id="campo-loja-corredor" type="text" style="display:none" />
             </div>
             <div class="form-secao">
-                <div class="form-secao-titulo">🏭 Endereço no Depósito</div>
+                <div class="form-secao-titulo"> Endereço no Depósito</div>
                 <div class="form-row">
                     <div class="form-group"><label>Corredor</label><input id="campo-dep-corredor" type="text" placeholder="Ex: D1..."/></div>
                     <div class="form-group"><label>Armário</label><input id="campo-dep-armario" type="text" placeholder="Ex: 1, 2..."/></div>
@@ -455,7 +451,7 @@
                 <div class="form-group"><label>Prateleira</label><input id="campo-dep-prateleira" type="text" placeholder="Ex: A, B..."/></div>
             </div>
             <div class="form-secao">
-                <div class="form-secao-titulo">📅 Lotes de Validade</div>
+                <div class="form-secao-titulo"> Lotes de Validade</div>
                 <div id="lista-validades-form"></div>
                 <div class="val-add-row">
                     <div class="form-group" style="flex:1"><label>Data de Validade</label><input id="nova-val-data" type="date"/></div>
@@ -466,7 +462,7 @@
         </div>
         <div class="modal-footer">
             <button class="btn-secundario" onclick="Cadastro.fecharFormulario()">Cancelar</button>
-            <button class="btn-primario"   onclick="Cadastro.salvarFormulario()">💾 Salvar Produto</button>
+            <button class="btn-primario"   onclick="Cadastro.salvarFormulario()"> Salvar Produto</button>
         </div>
     </div>
 </div>
@@ -475,7 +471,7 @@
 <div id="modal-recibo">
     <div class="recibo-box">
         <div class="recibo-acoes">
-            <button class="btn-imprimir" onclick="Caixa.imprimirRecibo()">🖨️ Imprimir</button>
+            <button class="btn-imprimir" onclick="Caixa.imprimirRecibo()"> Imprimir</button>
             <button class="btn-fechar-recibo" onclick="Caixa.fecharRecibo()">✕ Fechar</button>
         </div>
         <div id="recibo-conteudo"></div>
@@ -570,8 +566,8 @@ const App = {
         const file = input.files[0]; if (!file) return;
         const cb = (ok, qtd) => {
             input.value = '';
-            if (ok) { ListaProdutos.renderizar(); alert(`✅ ${qtd} produtos importados!`); }
-            else    { alert('❌ Erro ao importar.'); }
+            if (ok) { ListaProdutos.renderizar(); alert(` ${qtd} produtos importados!`); }
+            else    { alert(' Erro ao importar.'); }
         };
         if (file.name.endsWith('.json')) DB.importarJSON(file, cb);
         else DB.importarExcel(file, cb);
@@ -723,7 +719,7 @@ const MapDeposito = (() => {
             lista.innerHTML = '<em style="color:var(--text-muted)">Posição livre</em>';
         } else {
             const statusCor   = { vencido:'#ef4444', atencao:'#f59e0b', ok:'var(--text-muted)' };
-            const statusLabel = { vencido:'🔴 Vencido', atencao:'🟡 Vence em breve', ok:'🟢 OK' };
+            const statusLabel = { vencido:' Vencido', atencao:' Vence em breve', ok:' OK' };
 
             lista.innerHTML = produtos.map(p => {
                 const qtd     = (p.validades||[]).reduce((s,v) => s+v.quantidade, 0);
@@ -742,16 +738,16 @@ const MapDeposito = (() => {
                         <span style="font-size:11px;white-space:nowrap;color:${statusCor[status]}">${statusLabel[status]}</span>
                     </div>
                     <div style="display:flex;gap:12px;margin-top:8px;font-size:11px;flex-wrap:wrap;color:var(--text-muted)">
-                        <span>📦 <strong style="color:var(--text-main)">${qtd} un.</strong></span>
-                        <span>🏷️ Arm. ${p.deposito?.armario||'—'} · Prat. ${p.deposito?.prateleira||'—'}</span>
-                        <span>🏪 Loja: <strong style="color:var(--text-main)">${p.loja?.gondola||'—'}</strong></span>
-                        ${proxVal ? `<span style="color:${statusCor[status]}">📅 ${proxVal.data}</span>` : ''}
+                        <span> <strong style="color:var(--text-main)">${qtd} un.</strong></span>
+                        <span> Arm. ${p.deposito?.armario||'—'} · Prat. ${p.deposito?.prateleira||'—'}</span>
+                        <span> Loja: <strong style="color:var(--text-main)">${p.loja?.gondola||'—'}</strong></span>
+                        ${proxVal ? `<span style="color:${statusCor[status]}"> ${proxVal.data}</span>` : ''}
                     </div>
                     <button onclick="App.irParaMapa('${p.loja?.gondola||''}','${nomeSafe}')"
                         style="margin-top:8px;width:100%;padding:6px;background:transparent;border:1px solid var(--border-color);border-radius:6px;color:var(--text-muted);font-size:11px;cursor:pointer"
                         onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--text-main)'"
                         onmouseout="this.style.borderColor='var(--border-color)';this.style.color='var(--text-muted)'">
-                        📍 Ver no Mapa da Loja
+                         Ver no Mapa da Loja
                     </button>
                 </div>`;
             }).join('');

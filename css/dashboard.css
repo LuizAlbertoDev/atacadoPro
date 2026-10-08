@@ -569,3 +569,7 @@
         -webkit-overflow-scrolling: touch;
     }
 }
+
+/* Painéis e ações sem emojis */
+.dash-card-icon { display: none; }
+.btn-excluir-val, .btn-excluir-val-inline { color: var(--text-muted); font-size: 12px; padding: 4px 7px; }
