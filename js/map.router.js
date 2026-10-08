@@ -107,13 +107,13 @@ const MapRouter = (() => {
                         <span>Qtd total: <strong class="${qtdTotal <= 10 ? 'alerta-estoque':''}">${qtdTotal} un.</strong></span>
                         ${proxVal ? `<span class="badge-validade ${status}">Val: ${proxVal.data}</span>` : ''}
                     </div>
-                    <div class="painel-prod-deposito">🏭 ${p.deposito?.corredor||'—'} · Arm ${p.deposito?.armario||'—'} · Prat ${p.deposito?.prateleira||'—'}</div>
+                    <div class="painel-prod-deposito"> ${p.deposito?.corredor||'—'} · Arm ${p.deposito?.armario||'—'} · Prat ${p.deposito?.prateleira||'—'}</div>
                     ` : ''}
                 </div>`;
             }).join('');
 
         el.infoPanel.innerHTML = `
-            <button class="close-btn" onclick="MapRouter.limparRota()">✖</button>
+            <button class="close-btn" onclick="MapRouter.limparRota()" aria-label="Fechar">&times;</button>
             <span class="info-label">${idGondola ? `Gôndola ${idGondola}` : titulo}</span>
             <h3 class="info-panel-titulo">${titulo}</h3>
             <p class="info-panel-desc">${descricao}</p>
