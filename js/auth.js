@@ -8,10 +8,10 @@ const Auth = (() => {
     let _perfil = 'cliente';
 
     const PERFIS = {
-        cliente:    { label: 'Cliente',    icon: '👤' },
-        admin:      { label: 'Admin',      icon: '🛡️' },
-        conferente: { label: 'Conferente', icon: '📋' },
-        caixa:      { label: 'Caixa',      icon: '🏧' },
+        cliente:    { label: 'Cliente',    icon: '' },
+        admin:      { label: 'Admin',      icon: '' },
+        conferente: { label: 'Conferente', icon: '' },
+        caixa:      { label: 'Caixa',      icon: '' },
     };
 
     function perfil()         { return _perfil; }
@@ -45,7 +45,7 @@ const Auth = (() => {
 
         // Atualiza botão/tag no header
         if (_perfil === 'cliente') {
-            btnLogin.textContent  = '🔑 Login';
+            btnLogin.textContent  = 'Selecionar perfil';
             btnLogin.className    = 'btn-login-header';
             if (perfilTag) perfilTag.style.display = 'none';
         } else {
@@ -53,7 +53,7 @@ const Auth = (() => {
             btnLogin.textContent = 'Sair';
             btnLogin.className   = 'btn-login-header ativo';
             if (perfilTag) {
-                perfilTag.textContent = `${p.icon} ${p.label}`;
+                perfilTag.textContent = p.label;
                 perfilTag.style.display = 'inline-flex';
             }
         }
